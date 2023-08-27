@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.FragmentAddContactDialogBinding
 import com.ozanarik.mvvmcontacts.model.Contacts
+import com.ozanarik.mvvmcontacts.ui.adapter.ContactsAdapter
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 class AddContactDialogFragment : DialogFragment() {
     private lateinit var binding: FragmentAddContactDialogBinding
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var contactsAdapter: ContactsAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,7 +38,7 @@ class AddContactDialogFragment : DialogFragment() {
 
 
 
-
+        contactsAdapter = ContactsAdapter()
 
         binding.buttonSaveContact.setOnClickListener {
 
@@ -69,6 +71,8 @@ class AddContactDialogFragment : DialogFragment() {
 
                         is Resource.Success->{
                             Snackbar.make(binding.buttonSaveContact,"$contactName saved",Snackbar.LENGTH_LONG).show()
+                            contactsAdapter.notifyDataSetChanged()
+
                         }
                         is Resource.Loading->{
                             Snackbar.make(binding.buttonSaveContact,"Saving Contact",Snackbar.LENGTH_LONG).show()

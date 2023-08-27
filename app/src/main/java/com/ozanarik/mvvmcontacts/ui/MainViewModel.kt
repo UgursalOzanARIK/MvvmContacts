@@ -22,6 +22,9 @@ class MainViewModel @Inject constructor(private val firebaseRepository: Firebase
     private val _uploadContactToFireStoreState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val uploadContactToFireStoreState:StateFlow<Resource<Unit>> = _uploadContactToFireStoreState
 
+    private val _readFireStoreDataState:MutableStateFlow<Resource<List<Contacts>>> = MutableStateFlow(Resource.Loading())
+    val readFireStoreDataState:StateFlow<Resource<List<Contacts>>> = _readFireStoreDataState
+
 
     fun signUp(email:String,password:String){
 
@@ -77,4 +80,15 @@ class MainViewModel @Inject constructor(private val firebaseRepository: Firebase
             }
         }
     }
-}
+
+    fun readAllFireStoreData() = viewModelScope.launch {
+
+
+        _readFireStoreDataState.value = Resource.Loading()
+
+        val state = firebaseRepository.readAllFireStoreContactData()
+
+        _readFireStoreDataState.value = state
+
+        }
+    }
