@@ -1,7 +1,8 @@
-package com.ozanarik.mvvmcontacts
+package com.ozanarik.mvvmcontacts.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.ozanarik.mvvmcontacts.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
