@@ -3,11 +3,20 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    id("com.google.gms.google-services")
+
+
 }
 
 android {
     namespace = "com.ozanarik.mvvmcontacts"
     compileSdk = 33
+
+    buildFeatures{
+
+        viewBinding = true
+
+    }
 
     defaultConfig {
         applicationId = "com.ozanarik.mvvmcontacts"
