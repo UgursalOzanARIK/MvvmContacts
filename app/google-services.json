@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "582005729606",
+    "project_id": "mvvmcontacts-56c48",
+    "storage_bucket": "mvvmcontacts-56c48.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:582005729606:android:df9c6c9554930628d3dd47",
+        "android_client_info": {
+          "package_name": "com.ozanarik.mvvmcontacts"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "582005729606-gi7kh8a1kopnrkcq1j84q0e05qgaiagc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpeVaCg9h1h3PuDYGLsJ5EJpCKFzi4A18"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "582005729606-gi7kh8a1kopnrkcq1j84q0e05qgaiagc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
