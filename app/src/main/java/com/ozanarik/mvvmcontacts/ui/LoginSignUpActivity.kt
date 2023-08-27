@@ -18,7 +18,8 @@ import kotlin.math.sign
 
 @AndroidEntryPoint
 class LoginSignUpActivity : AppCompatActivity() {
-    private lateinit var mainViewModel: MainViewModel
+    lateinit var mainViewModel: MainViewModel
+
     private lateinit var auth: FirebaseAuth
     private lateinit var binding: ActivityLoginSignUpBinding
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,18 +1,26 @@
 package com.ozanarik.mvvmcontacts.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.ozanarik.mvvmcontacts.business.repository.FirebaseRepository
+import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val auth: FirebaseAuth) :ViewModel() {
+class MainViewModel @Inject constructor(private val firebaseRepository: FirebaseRepository,private val auth: FirebaseAuth) :ViewModel() {
 
     private val _signUpResult:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val signUpResult:StateFlow<Resource<Unit>> = _signUpResult
+
+    private val _uploadContactToFireStoreState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
+    val uploadContactToFireStoreState:StateFlow<Resource<Unit>> = _uploadContactToFireStoreState
 
 
     fun signUp(email:String,password:String){
@@ -47,4 +55,26 @@ class MainViewModel @Inject constructor(private val auth: FirebaseAuth) :ViewMod
 
     }
 
+    fun uploadContactToFireStore(contacts: Contacts) = viewModelScope.launch {
+
+
+        val contactsName = contacts.name
+        val contactPhoneNumber = contacts.phoneNumber
+
+        firebaseRepository.uploadContactToFireStore(contactsName,contactPhoneNumber).collect{callResult->
+
+            when(callResult){
+
+                is Resource.Success->{
+                    _uploadContactToFireStoreState.value = Resource.Success(Unit)
+                }
+                is Resource.Error->{
+                    _uploadContactToFireStoreState.value = Resource.Error(callResult.message!!)
+                }
+                is Resource.Loading->{
+                    _uploadContactToFireStoreState.value = Resource.Loading()
+                }
+            }
+        }
+    }
 }
