@@ -10,8 +10,6 @@ import com.ozanarik.mvvmcontacts.model.Contacts
 
 class ContactsAdapter: RecyclerView.Adapter<ContactsAdapter.ContactsHolder>() {
 
-
-
     inner class ContactsHolder(val binding:ItemContactListBinding):RecyclerView.ViewHolder(binding.root)
 
     private val diffUtil = object: DiffUtil.ItemCallback<Contacts>(){

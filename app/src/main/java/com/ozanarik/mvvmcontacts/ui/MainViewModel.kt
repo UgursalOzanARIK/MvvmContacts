@@ -1,8 +1,12 @@
 package com.ozanarik.mvvmcontacts.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.MetadataChanges
 import com.ozanarik.mvvmcontacts.business.repository.FirebaseRepository
 import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.util.Resource
@@ -14,7 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val firebaseRepository: FirebaseRepository,private val auth: FirebaseAuth) :ViewModel() {
+class MainViewModel @Inject constructor(private val firestore: FirebaseFirestore,private val firebaseRepository: FirebaseRepository,private val auth: FirebaseAuth) :ViewModel() {
 
     private val _signUpResult:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val signUpResult:StateFlow<Resource<Unit>> = _signUpResult
@@ -58,37 +62,85 @@ class MainViewModel @Inject constructor(private val firebaseRepository: Firebase
 
     }
 
-    fun uploadContactToFireStore(contacts: Contacts) = viewModelScope.launch {
 
 
-        val contactsName = contacts.name
-        val contactPhoneNumber = contacts.phoneNumber
+fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Resource<Unit>{
 
-        firebaseRepository.uploadContactToFireStore(contactsName,contactPhoneNumber).collect{callResult->
 
-            when(callResult){
+    try {
+        val currentUserUID = auth.currentUser?.uid
 
-                is Resource.Success->{
-                    _uploadContactToFireStoreState.value = Resource.Success(Unit)
-                }
-                is Resource.Error->{
-                    _uploadContactToFireStoreState.value = Resource.Error(callResult.message!!)
-                }
-                is Resource.Loading->{
-                    _uploadContactToFireStoreState.value = Resource.Loading()
-                }
+        if(currentUserUID!=null){
+
+            val userRef = firestore.collection("Users").document(currentUserUID)
+
+            val contactMap = hashMapOf<String,Any>()
+
+            val timeUploaded = Timestamp.now()
+
+            contactMap["contactName"] = contactName
+            contactMap["contactPhoneNumber"] = contactPhoneNumber
+            contactMap["timeUploaded"] = timeUploaded
+            contactMap["currentUserEmail"] = auth.currentUser!!.email!!
+
+            userRef.collection("Contacts").add(contactMap).addOnSuccessListener {
+
+                Log.e("asd","successfully created")
+                _uploadContactToFireStoreState.value = Resource.Success(Unit)
+
+            }.addOnFailureListener {
+                Log.e("asd","ananı sikeyim")
+                _uploadContactToFireStoreState.value = Resource.Error(it.localizedMessage!!)
             }
         }
+
+
+    }catch (e:Exception) {
+
+        return Resource.Error(e.localizedMessage!!)
+
+    }
+    return Resource.Loading()
     }
 
-    fun readAllFireStoreData() = viewModelScope.launch {
+
+    fun readFireStoreContactData()=viewModelScope.launch {
+
+        val currentUser = auth.currentUser
+        val currentUserUID = currentUser?.uid
+
+        val contactList = mutableListOf<Contacts>()
+
+        try {
+            if (currentUserUID!=null){
+
+                val userRef = firestore.collection("Users").document(currentUserUID)
+
+                userRef.collection("Contacts").addSnapshotListener(MetadataChanges.INCLUDE){ value, error->
+
+                    if (error==null && value!=null){
+
+                        contactList.clear()
+                        val contacts = value.documents
+
+                        for (c in contacts){
 
 
-        _readFireStoreDataState.value = Resource.Loading()
+                            val contactName = c.get("contactName") as  String
+                            val contactPhoneNumber = c.get("contactPhoneNumber") as String
 
-        val state = firebaseRepository.readAllFireStoreContactData()
+                            val newContact=Contacts(contactName,contactPhoneNumber)
 
-        _readFireStoreDataState.value = state
+                            contactList.add(newContact)
 
+                            _readFireStoreDataState.value = Resource.Success(contactList)
+
+                        }
+                    }
+                }
+            }
+        }catch (e:Exception){
+            _readFireStoreDataState.value = Resource.Error(e.localizedMessage!!)
         }
     }
+}

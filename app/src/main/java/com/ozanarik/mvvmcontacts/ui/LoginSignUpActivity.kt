@@ -44,9 +44,6 @@ class LoginSignUpActivity : AppCompatActivity() {
             val password = binding.editTextPassword.text.toString()
 
             signUp(email,password)
-            startActivity(Intent(this@LoginSignUpActivity,MainActivity::class.java))
-            finish()
-
             }
         }
 
@@ -64,6 +61,9 @@ class LoginSignUpActivity : AppCompatActivity() {
                     is Resource.Success->{
                         //RECYCLERVIEW TO BE UPDATED
                         Snackbar.make(binding.buttonSignUp,"helal lan",Snackbar.LENGTH_LONG).show()
+                        startActivity(Intent(this@LoginSignUpActivity,MainActivity::class.java))
+                        finish()
+
                     }
                     is Resource.Error->{
                         Snackbar.make(binding.buttonSignUp,result.message.toString(),Snackbar.LENGTH_LONG).show()

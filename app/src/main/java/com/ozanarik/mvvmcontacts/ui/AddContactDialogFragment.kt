@@ -3,10 +3,12 @@ package com.ozanarik.mvvmcontacts.ui
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -56,12 +58,9 @@ class AddContactDialogFragment : DialogFragment() {
         val contactName = binding.editTextNameToAdd.text.toString()
         val contactPhoneNumber = binding.editTextTextPhoneToAdd.text.toString()
 
-        val newContact = Contacts(contactName,contactPhoneNumber)
-
-
         if(contactName.isNotEmpty() && contactPhoneNumber.isNotEmpty()){
 
-            mainViewModel.uploadContactToFireStore(newContact)
+            mainViewModel.uploadContactToFireStore(contactName,contactPhoneNumber)
 
             viewLifecycleOwner.lifecycleScope.launch {
 
@@ -71,8 +70,6 @@ class AddContactDialogFragment : DialogFragment() {
 
                         is Resource.Success->{
                             Snackbar.make(binding.buttonSaveContact,"$contactName saved",Snackbar.LENGTH_LONG).show()
-                            contactsAdapter.notifyDataSetChanged()
-
                         }
                         is Resource.Loading->{
                             Snackbar.make(binding.buttonSaveContact,"Saving Contact",Snackbar.LENGTH_LONG).show()
@@ -81,13 +78,13 @@ class AddContactDialogFragment : DialogFragment() {
                             Snackbar.make(binding.buttonSaveContact,"${saveResult.message}",Snackbar.LENGTH_LONG).show()
                         }
                     }
+                    mainViewModel.readFireStoreContactData()
                 }
             }
-        }else{
+        }
+        else{
 
             Snackbar.make(binding.buttonSaveContact,"Contact name and contact phone number must be filled properly",Snackbar.LENGTH_LONG).show()
-
         }
-    }
 
-}
+}}
