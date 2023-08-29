@@ -7,8 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ozanarik.mvvmcontacts.databinding.ItemContactListBinding
 import com.ozanarik.mvvmcontacts.model.Contacts
+import com.ozanarik.mvvmcontacts.util.AdapterItemClickListener
 
-class ContactsAdapter: RecyclerView.Adapter<ContactsAdapter.ContactsHolder>() {
+class ContactsAdapter(private val clickListener: AdapterItemClickListener): RecyclerView.Adapter<ContactsAdapter.ContactsHolder>(){
 
     inner class ContactsHolder(val binding:ItemContactListBinding):RecyclerView.ViewHolder(binding.root)
 
@@ -41,12 +42,17 @@ class ContactsAdapter: RecyclerView.Adapter<ContactsAdapter.ContactsHolder>() {
 
         holder.binding.apply {
             textViewName.text = currentContact.name
-            textViewPhone.text = currentContact.phoneNumber
+        }
+
+        holder.itemView.apply {
+            setOnClickListener {
+                clickListener.onItemClick(position)
+            }
         }
 
     }
-
     override fun getItemCount(): Int {
         return differList.currentList.size
     }
+
 }

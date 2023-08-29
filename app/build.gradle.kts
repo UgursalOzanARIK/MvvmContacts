@@ -68,6 +68,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    kapt("androidx.lifecycle:lifecycle-compiler:2.6.1")
+    kapt("androidx.lifecycle:lifecycle-common:2.6.1")
 
 }

@@ -4,35 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.MainActivity">
-
-
+    tools:context=".ui.MainActivity"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp">
-
-
+        android:layout_height="wrap_content"
+        >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:layout_scrollFlags="snap|enterAlwaysCollapsed|enterAlways">
+            android:layout_height="150dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways"
 
+            >
 
             <androidx.appcompat.widget.Toolbar
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:title="Your Contacts"
-                app:titleTextColor="@color/black"/>
+                app:titleTextColor="@color/black"
+                app:layout_collapseMode="parallax"
+                />
 
 
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-
-
-
 
     </com.google.android.material.appbar.AppBarLayout>
 

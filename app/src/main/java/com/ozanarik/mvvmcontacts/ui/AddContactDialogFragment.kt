@@ -4,32 +4,29 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
-import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.FragmentAddContactDialogBinding
-import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.ui.adapter.ContactsAdapter
+import com.ozanarik.mvvmcontacts.util.AdapterItemClickListener
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class AddContactDialogFragment : DialogFragment() {
+class AddContactDialogFragment : DialogFragment(){
     private lateinit var binding: FragmentAddContactDialogBinding
     private lateinit var mainViewModel: MainViewModel
     private lateinit var contactsAdapter: ContactsAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         // Inflate the layout for this fragment
@@ -40,7 +37,13 @@ class AddContactDialogFragment : DialogFragment() {
 
 
 
-        contactsAdapter = ContactsAdapter()
+        contactsAdapter = ContactsAdapter(object : AdapterItemClickListener {
+            override fun onItemClick(position: Int) {
+
+                Log.e("click listener","clicked on click listener")
+
+            }
+        })
 
         binding.buttonSaveContact.setOnClickListener {
 
@@ -86,5 +89,6 @@ class AddContactDialogFragment : DialogFragment() {
 
             Snackbar.make(binding.buttonSaveContact,"Contact name and contact phone number must be filled properly",Snackbar.LENGTH_LONG).show()
         }
+}
 
-}}
+}

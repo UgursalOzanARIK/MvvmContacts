@@ -1,5 +1,6 @@
 package com.ozanarik.mvvmcontacts.ui
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -19,13 +20,14 @@ import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.ActivityMainBinding
 import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.ui.adapter.ContactsAdapter
+import com.ozanarik.mvvmcontacts.util.AdapterItemClickListener
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(){
     private lateinit var firestore: FirebaseFirestore
     private lateinit var binding: ActivityMainBinding
     private lateinit var auth: FirebaseAuth
@@ -50,7 +52,6 @@ class MainActivity : AppCompatActivity() {
 
             //addContact
             AddContactDialogFragment().show(supportFragmentManager,AddContactDialogFragment().tag)
-
         }
 
     }
@@ -82,7 +83,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleRecyclerView(){
-        contactsAdapter = ContactsAdapter()
+        contactsAdapter = ContactsAdapter(object : AdapterItemClickListener {
+            override fun onItemClick(position: Int) {
+
+                Log.e("asd",position.toString())
+            }
+        })
 
         binding.contactRv.apply {
 
@@ -93,7 +99,6 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
-
 
     override fun onStart() {
         super.onStart()
