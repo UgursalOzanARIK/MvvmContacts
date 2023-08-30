@@ -6,4 +6,173 @@
     android:layout_height="match_parent"
     tools:context=".ui.ContactDetailActivity">
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewContact"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="48dp"
+        android:backgroundTint="@color/gray"
+        app:cardCornerRadius="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageViewContactPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/baseline_person_24" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/textViewNameDetail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="32dp"
+        android:text="Uğursal Ozan ARIK"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardViewContact" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewCall"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="32dp"
+        android:backgroundTint="@color/callImgView"
+        app:cardCornerRadius="50dp"
+        app:layout_constraintEnd_toStartOf="@+id/cardViewMessage"
+        app:layout_constraintTop_toBottomOf="@+id/textViewNameDetail">
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            app:srcCompat="@drawable/baseline_call_24" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewMessage"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="32dp"
+        android:backgroundTint="@color/msgImgView"
+        app:cardCornerRadius="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewNameDetail">
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:padding="8dp"
+            app:srcCompat="@drawable/baseline_message_24" />
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/imgViewMore"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/baseline_more_vert_24" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="32dp"
+        android:text="WhatsApp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewPhoneNumber" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewWhatsapp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        app:cardCornerRadius="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardViewMessage">
+
+        <ImageView
+            android:id="@+id/imageView7"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/whatsap" />
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/imageView9"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/textViewAddToFav"
+        app:layout_constraintEnd_toStartOf="@+id/imageView10"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/baseline_favorite_border_24" />
+
+    <TextView
+        android:id="@+id/textViewAddToFav"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Add To Favourites"
+        android:textAlignment="viewStart"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/textViewUpdateContact"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView10"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/textViewUpdateContact"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/imageView9"
+        app:srcCompat="@drawable/baseline_miscellaneous_services_24" />
+
+    <TextView
+        android:id="@+id/textViewUpdateContact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Update Contact"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/textViewAddToFav" />
+
+    <TextView
+        android:id="@+id/textViewPhoneNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="64dp"
+        android:text="0541 396 54 56"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewNameDetail" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,7 +17,7 @@ class ContactsAdapter(private val clickListener: AdapterItemClickListener): Recy
 
         override fun areItemsTheSame(oldItem: Contacts, newItem: Contacts): Boolean {
 
-            return oldItem.phoneNumber == newItem.phoneNumber
+            return oldItem == newItem
 
         }
 

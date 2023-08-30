@@ -7,6 +7,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
+import com.google.firebase.ktx.Firebase
 import com.ozanarik.mvvmcontacts.business.repository.FirebaseRepository
 import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.util.Resource
@@ -18,10 +19,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val firestore: FirebaseFirestore,private val firebaseRepository: FirebaseRepository,private val auth: FirebaseAuth) :ViewModel() {
+class MainViewModel @Inject constructor(private val firebaseStorage:Fire, private val firestore: FirebaseFirestore, private val firebaseRepository: FirebaseRepository, private val auth: FirebaseAuth) :ViewModel() {
 
     private val _signUpResult:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val signUpResult:StateFlow<Resource<Unit>> = _signUpResult
+
+    private val _uploadPhotoState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
+    val uploadPhotoState:StateFlow<Resource<Unit>> = _uploadPhotoState
 
     private val _uploadContactToFireStoreState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val uploadContactToFireStoreState:StateFlow<Resource<Unit>> = _uploadContactToFireStoreState
@@ -30,7 +34,7 @@ class MainViewModel @Inject constructor(private val firestore: FirebaseFirestore
     val readFireStoreDataState:StateFlow<Resource<List<Contacts>>> = _readFireStoreDataState
 
 
-    fun signUp(email:String,password:String){
+    fun signUp(email:String,password:String)=viewModelScope.launch{
 
         if(email.isEmpty() || password.isEmpty()){
 
@@ -40,8 +44,15 @@ class MainViewModel @Inject constructor(private val firestore: FirebaseFirestore
         }
     }
 
-    fun signUpUser(email:String,password:String):Resource<Unit> {
+    fun uploadPhotoToFirebaseStorage():Resource<Unit> {
 
+        _uploadPhotoState.value = Resource.Loading()
+
+
+
+    }
+
+    fun signUpUser(email:String,password:String):Resource<Unit> {
 
         try {
 

@@ -1,3 +1,5 @@
 package com.ozanarik.mvvmcontacts.model
 
-data class Contacts(val name:String = "", val phoneNumber:String = "")
+import java.io.Serializable
+
+data class Contacts(val name:String = "", val phoneNumber:String = ""):Serializable

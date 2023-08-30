@@ -86,7 +86,14 @@ class MainActivity : AppCompatActivity(){
         contactsAdapter = ContactsAdapter(object : AdapterItemClickListener {
             override fun onItemClick(position: Int) {
 
-                Log.e("asd",position.toString())
+                val currentContact = contactsAdapter.differList.currentList[position]
+
+                val intent = Intent(this@MainActivity,ContactDetailActivity::class.java)
+
+                intent.putExtra("contactName",currentContact.name)
+                intent.putExtra("contactPhoneNumber",currentContact.phoneNumber)
+
+                startActivity(intent)
             }
         })
 
@@ -100,9 +107,11 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+
+    override fun onResume() {
+        readFireStoreContacts()
         handleRecyclerView()
+        super.onResume()
     }
 
 }
