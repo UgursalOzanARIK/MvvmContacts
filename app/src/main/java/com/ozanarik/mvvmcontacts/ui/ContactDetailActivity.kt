@@ -8,14 +8,21 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.ActivityContactDetailBinding
+import com.ozanarik.mvvmcontacts.util.Resource
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ContactDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityContactDetailBinding
     private lateinit var contactName:String
@@ -24,16 +31,18 @@ class ContactDetailActivity : AppCompatActivity() {
     private lateinit var permissionLauncher:ActivityResultLauncher<String>
     private lateinit var imagePickerLauncher:ActivityResultLauncher<Intent>
 
+    private lateinit var mainViewModel: MainViewModel
 
     var selectedImg: Uri ?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         binding = ActivityContactDetailBinding.inflate(layoutInflater)
-        val root = binding.root
 
         handleActivityResultLaunchers()
+
 
         contactName = intent.getStringExtra("contactName")!!
         contactPhoneNumber = intent.getStringExtra("contactPhoneNumber")!!
@@ -41,7 +50,6 @@ class ContactDetailActivity : AppCompatActivity() {
 
 
         handleUserContactIntents()
-        setContentView(root)
         handleContactInfo()
 
 
@@ -49,6 +57,12 @@ class ContactDetailActivity : AppCompatActivity() {
             pickImageForContact()
 
         }
+
+
+        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        val root = binding.root
+        setContentView(root)
+
 
     }
 
@@ -88,6 +102,25 @@ class ContactDetailActivity : AppCompatActivity() {
                     selectedImg = intentData.data
 
                     selectedImg?.let { binding.imageViewContactPhoto.setImageURI(it) }
+                    mainViewModel.uploadPhotoToFirebaseStorage(selectedImg!!)
+
+                    lifecycleScope.launch {
+                        mainViewModel.uploadPhotoState.collect{
+
+                            when(it){
+                                is Resource.Success->{
+                                    Toast.makeText(this@ContactDetailActivity,"Image successfully updated!",Toast.LENGTH_LONG).show()
+                                }
+                                is Resource.Error->{
+                                    Toast.makeText(this@ContactDetailActivity,it.message,Toast.LENGTH_LONG).show()
+                                }
+                                is Resource.Loading->{
+                                    Toast.makeText(this@ContactDetailActivity,"Updating photo...",Toast.LENGTH_LONG).show()
+                                }
+                            }
+
+                        }
+                    }
 
                 }
             }

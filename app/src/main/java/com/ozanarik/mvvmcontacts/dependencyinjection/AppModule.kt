@@ -2,7 +2,7 @@ package com.ozanarik.mvvmcontacts.dependencyinjection
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.ozanarik.mvvmcontacts.business.repository.FirebaseRepository
+import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,17 +20,11 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideFireStore()=FirebaseFirestore.getInstance()
+    fun provideFireStore():FirebaseFirestore=FirebaseFirestore.getInstance()
 
     @Provides
     @Singleton
-    fun provideFirebaseRepository(auth:FirebaseAuth,firebaseFirestore: FirebaseFirestore):FirebaseRepository{
-
-        return FirebaseRepository(auth,firebaseFirestore)
-
-
-    }
-
+    fun provideFirebaseStorage():FirebaseStorage = FirebaseStorage.getInstance()
 
 
 }

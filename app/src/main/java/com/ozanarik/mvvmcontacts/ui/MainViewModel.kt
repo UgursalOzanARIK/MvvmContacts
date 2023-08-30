@@ -1,5 +1,6 @@
 package com.ozanarik.mvvmcontacts.ui
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,19 +8,18 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
-import com.google.firebase.ktx.Firebase
-import com.ozanarik.mvvmcontacts.business.repository.FirebaseRepository
+import com.google.firebase.storage.FirebaseStorage
 import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val firebaseStorage:Fire, private val firestore: FirebaseFirestore, private val firebaseRepository: FirebaseRepository, private val auth: FirebaseAuth) :ViewModel() {
+class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStorage, private val firestore: FirebaseFirestore,private val auth: FirebaseAuth) :ViewModel() {
 
     private val _signUpResult:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val signUpResult:StateFlow<Resource<Unit>> = _signUpResult
@@ -34,6 +34,9 @@ class MainViewModel @Inject constructor(private val firebaseStorage:Fire, privat
     val readFireStoreDataState:StateFlow<Resource<List<Contacts>>> = _readFireStoreDataState
 
 
+
+
+
     fun signUp(email:String,password:String)=viewModelScope.launch{
 
         if(email.isEmpty() || password.isEmpty()){
@@ -44,11 +47,51 @@ class MainViewModel @Inject constructor(private val firebaseStorage:Fire, privat
         }
     }
 
-    fun uploadPhotoToFirebaseStorage():Resource<Unit> {
-
-        _uploadPhotoState.value = Resource.Loading()
+    fun uploadPhotoToFirebaseStorage(selectedImg:Uri):Resource<Unit> {
 
 
+        val userRef = firebaseStorage.reference
+        val randomUID = UUID.randomUUID()
+
+        val imageName = "${auth.currentUser!!.email} $randomUID.png"
+
+        val imgRef = userRef.child("images/").child(imageName)
+
+        imgRef.putFile(selectedImg).addOnSuccessListener {
+
+
+            imgRef.downloadUrl.addOnSuccessListener {
+
+                val downloadUrl = it.toString()
+
+                val currentUser = auth.currentUser
+                val currentUserUID = currentUser?.uid
+
+                if(currentUserUID!=null){
+
+                    val contactMap = hashMapOf<String,Any>()
+
+                    contactMap["downloadUrl"] = downloadUrl
+                    contactMap["timeStamp"] = Timestamp.now()
+
+
+                    val collection = firestore.collection("Users").document(currentUserUID)
+
+                    collection.collection("Contacts").add(contactMap).addOnSuccessListener {
+                       Log.e("asd","helal")
+                    }.addOnFailureListener {e->
+                        Log.e("asd",e.localizedMessage!!)
+                    }
+                }
+            }
+
+
+            _uploadPhotoState.value = Resource.Success(Unit)
+        }.addOnFailureListener{
+            _uploadPhotoState.value = Resource.Error(it.localizedMessage!!)
+        }
+
+        return Resource.Loading()
 
     }
 
@@ -84,8 +127,8 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
         if(currentUserUID!=null){
 
             val userRef = firestore.collection("Users").document(currentUserUID)
-
             val contactMap = hashMapOf<String,Any>()
+
 
             val timeUploaded = Timestamp.now()
 
@@ -129,13 +172,12 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
 
                 userRef.collection("Contacts").addSnapshotListener(MetadataChanges.INCLUDE){ value, error->
 
-                    if (error==null && value!=null){
+                    if (value!=null){
 
                         contactList.clear()
                         val contacts = value.documents
 
                         for (c in contacts){
-
 
                             val contactName = c.get("contactName") as  String
                             val contactPhoneNumber = c.get("contactPhoneNumber") as String
