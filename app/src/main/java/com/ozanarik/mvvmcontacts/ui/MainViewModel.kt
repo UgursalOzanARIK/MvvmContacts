@@ -169,6 +169,7 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
         val currentUserUID = currentUser?.uid
 
         val contactList = mutableListOf<Contacts>()
+
             try {
                 if (currentUserUID!=null){
 
@@ -209,7 +210,7 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
 
     fun deleteFireStoreContact(contactName:String,contactPhoneNumber: String) = viewModelScope.launch {
 
-        val currentUser = auth?.currentUser
+        val currentUser = auth.currentUser
         val currentUserUID = currentUser?.uid
 
 
