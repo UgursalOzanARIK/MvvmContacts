@@ -36,7 +36,6 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
 
 
 
-
     fun signUp(email:String,password:String)=viewModelScope.launch{
 
         if(email.isEmpty() || password.isEmpty()){
@@ -67,7 +66,9 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
                 val currentUser = auth.currentUser
                 val currentUserUID = currentUser?.uid
 
-                if(currentUserUID!=null){
+                Log.e("asd","sssss")
+
+       /*         if(currentUserUID!=null){
 
                     val contactMap = hashMapOf<String,Any>()
 
@@ -82,7 +83,7 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
                     }.addOnFailureListener {e->
                         Log.e("asd",e.localizedMessage!!)
                     }
-                }
+                }*/
             }
 
 
@@ -164,36 +165,41 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
         val currentUserUID = currentUser?.uid
 
         val contactList = mutableListOf<Contacts>()
+            try {
+                if (currentUserUID!=null){
 
-        try {
-            if (currentUserUID!=null){
+                    val userRef = firestore.collection("Users").document(currentUserUID)
 
-                val userRef = firestore.collection("Users").document(currentUserUID)
+                    userRef.collection("Contacts").addSnapshotListener(MetadataChanges.INCLUDE){ value, error->
 
-                userRef.collection("Contacts").addSnapshotListener(MetadataChanges.INCLUDE){ value, error->
+                        if (value!=null){
 
-                    if (value!=null){
+                            val newContactList = mutableListOf<Contacts>()
 
-                        contactList.clear()
-                        val contacts = value.documents
 
-                        for (c in contacts){
+                            val contacts = value.documents
 
-                            val contactName = c.get("contactName") as  String
-                            val contactPhoneNumber = c.get("contactPhoneNumber") as String
+                            for (c in contacts){
 
-                            val newContact=Contacts(contactName,contactPhoneNumber)
+                                val contactName = c.get("contactName")as String
+                                val contactPhoneNumber = c.get("contactPhoneNumber")as String
 
-                            contactList.add(newContact)
+                                val newContact=Contacts(contactName,contactPhoneNumber)
 
+                                newContactList.add(newContact)
+                            }
+
+                            synchronized(contactList){
+                                contactList.clear()
+                                contactList.addAll(newContactList)
+                            }
                             _readFireStoreDataState.value = Resource.Success(contactList)
 
                         }
                     }
                 }
+            }catch (e:Exception){
+                _readFireStoreDataState.value = Resource.Error(e.localizedMessage!!)
             }
-        }catch (e:Exception){
-            _readFireStoreDataState.value = Resource.Error(e.localizedMessage!!)
-        }
     }
 }

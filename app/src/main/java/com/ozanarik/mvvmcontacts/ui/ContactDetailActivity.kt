@@ -102,25 +102,9 @@ class ContactDetailActivity : AppCompatActivity() {
                     selectedImg = intentData.data
 
                     selectedImg?.let { binding.imageViewContactPhoto.setImageURI(it) }
-                    mainViewModel.uploadPhotoToFirebaseStorage(selectedImg!!)
 
-                    lifecycleScope.launch {
-                        mainViewModel.uploadPhotoState.collect{
 
-                            when(it){
-                                is Resource.Success->{
-                                    Toast.makeText(this@ContactDetailActivity,"Image successfully updated!",Toast.LENGTH_LONG).show()
-                                }
-                                is Resource.Error->{
-                                    Toast.makeText(this@ContactDetailActivity,it.message,Toast.LENGTH_LONG).show()
-                                }
-                                is Resource.Loading->{
-                                    Toast.makeText(this@ContactDetailActivity,"Updating photo...",Toast.LENGTH_LONG).show()
-                                }
-                            }
 
-                        }
-                    }
 
                 }
             }

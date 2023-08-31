@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity(){
             mainViewModel.readFireStoreDataState.collect{resultData->
                 when(resultData){
                     is Resource.Success->{
-                        resultData.data?.let { contactsAdapter.differList.submitList(it) }
+                        resultData?.let { contactsAdapter.differList.submitList(it.data) }
                         contactsAdapter.notifyDataSetChanged()
                         Log.e("asdas","got data")
 

@@ -1,5 +1,6 @@
 package com.ozanarik.mvvmcontacts.ui.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -17,7 +18,7 @@ class ContactsAdapter(private val clickListener: AdapterItemClickListener): Recy
 
         override fun areItemsTheSame(oldItem: Contacts, newItem: Contacts): Boolean {
 
-            return oldItem == newItem
+            return oldItem.phoneNumber == newItem.phoneNumber
 
         }
 
@@ -27,7 +28,6 @@ class ContactsAdapter(private val clickListener: AdapterItemClickListener): Recy
         }
     }
     val differList = AsyncListDiffer(this,diffUtil)
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactsHolder {
 
@@ -39,6 +39,8 @@ class ContactsAdapter(private val clickListener: AdapterItemClickListener): Recy
 
     override fun onBindViewHolder(holder: ContactsHolder, position: Int) {
         val currentContact = differList.currentList[position]
+
+
 
         holder.binding.apply {
             textViewName.text = currentContact.name
