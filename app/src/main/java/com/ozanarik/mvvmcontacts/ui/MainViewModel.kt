@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.storage.FirebaseStorage
 import com.ozanarik.mvvmcontacts.model.Contacts
@@ -15,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
 import java.util.UUID
 import javax.inject.Inject
 
@@ -32,6 +34,9 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
 
     private val _readFireStoreDataState:MutableStateFlow<Resource<List<Contacts>>> = MutableStateFlow(Resource.Loading())
     val readFireStoreDataState:StateFlow<Resource<List<Contacts>>> = _readFireStoreDataState
+
+    private val _deleteFromFireStoreStateFlow:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
+    val deleteFromFireStoreStateFlow:StateFlow<Resource<Unit>> = _deleteFromFireStoreStateFlow
 
 
 
@@ -144,7 +149,7 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
                 _uploadContactToFireStoreState.value = Resource.Success(Unit)
 
             }.addOnFailureListener {
-                Log.e("asd","ananı sikeyim")
+                Log.e("asd", it.localizedMessage!!)
                 _uploadContactToFireStoreState.value = Resource.Error(it.localizedMessage!!)
             }
         }
@@ -157,7 +162,6 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
     }
     return Resource.Loading()
     }
-
 
     fun readFireStoreContactData()=viewModelScope.launch {
 
@@ -176,7 +180,6 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
 
                             val newContactList = mutableListOf<Contacts>()
 
-
                             val contacts = value.documents
 
                             for (c in contacts){
@@ -189,12 +192,12 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
                                 newContactList.add(newContact)
                             }
 
+                            //TO ACCESS THE FIRESTORE CONTACTS DATA ONLY ONCE AT A TIME, PREVENTING DUPLICATION AND UNNECESSARY LISTING ON RECYCLERVIEW
                             synchronized(contactList){
                                 contactList.clear()
                                 contactList.addAll(newContactList)
                             }
                             _readFireStoreDataState.value = Resource.Success(contactList)
-
                         }
                     }
                 }
@@ -202,4 +205,51 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
                 _readFireStoreDataState.value = Resource.Error(e.localizedMessage!!)
             }
     }
+
+
+    fun deleteFireStoreContact(contactName:String,contactPhoneNumber: String) = viewModelScope.launch {
+
+        val currentUser = auth?.currentUser
+        val currentUserUID = currentUser?.uid
+
+
+        if(currentUserUID!=null){
+            try {
+                val userRef = firestore.collection("Users").document(currentUserUID)
+
+                userRef.collection("Contacts")
+                    .whereEqualTo("contactName",contactName)
+                    .whereEqualTo("contactPhoneNumber",contactPhoneNumber)
+                    .get()
+                    .addOnSuccessListener {querySnapshot->
+
+                        for (document in querySnapshot ){
+
+                            document.reference.delete()
+                            Log.e("aaa","deleted ${document.id}")
+                            _deleteFromFireStoreStateFlow.value = Resource.Success(Unit)
+                        }
+                    }.addOnFailureListener {exception->
+
+                        _deleteFromFireStoreStateFlow.value = Resource.Error(exception.localizedMessage!!)
+                    }
+            }catch (e:Exception){
+                _deleteFromFireStoreStateFlow.value = Resource.Error(e.localizedMessage!!)
+
+            }catch (e:FirebaseFirestoreException){
+                _deleteFromFireStoreStateFlow.value = Resource.Error(e.localizedMessage!!)
+
+            }catch (e:IOException){
+                _deleteFromFireStoreStateFlow.value = Resource.Error(e.localizedMessage!!)
+            }
+        }
+
+
+
+
+
+
+
+    }
+
 }

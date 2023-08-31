@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 class AddContactDialogFragment : DialogFragment(){
     private lateinit var binding: FragmentAddContactDialogBinding
     private lateinit var mainViewModel: MainViewModel
-    private lateinit var contactsAdapter: ContactsAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,13 +36,6 @@ class AddContactDialogFragment : DialogFragment(){
 
 
 
-        contactsAdapter = ContactsAdapter(object : AdapterItemClickListener {
-            override fun onItemClick(position: Int) {
-
-                Log.e("click listener","clicked on click listener")
-
-            }
-        })
 
         binding.buttonSaveContact.setOnClickListener {
 

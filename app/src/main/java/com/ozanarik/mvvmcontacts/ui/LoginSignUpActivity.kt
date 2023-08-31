@@ -30,13 +30,11 @@ class LoginSignUpActivity : AppCompatActivity() {
         setContentView(root)
         auth = Firebase.auth
 
+        handleCurrentUser()
+
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
 
-        if(auth.currentUser!=null){
-            startActivity(Intent(this@LoginSignUpActivity,MainActivity::class.java))
-            finish()
-        }
 
         binding.buttonSignUp.setOnClickListener {
 
@@ -78,4 +76,13 @@ class LoginSignUpActivity : AppCompatActivity() {
 
 
     }
+
+    private fun handleCurrentUser(){
+        if(auth.currentUser!=null){
+            startActivity(Intent(this@LoginSignUpActivity,MainActivity::class.java))
+            finish()
+        }
+
+    }
+
     }
