@@ -169,9 +169,8 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
         val currentUserUID = currentUser?.uid
 
         val contactList = mutableListOf<Contacts>()
-
-            try {
-                if (currentUserUID!=null){
+        try {
+            if (currentUserUID!=null){
 
                     val userRef = firestore.collection("Users").document(currentUserUID)
 
@@ -188,7 +187,7 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
                                 val contactName = c.get("contactName")as String
                                 val contactPhoneNumber = c.get("contactPhoneNumber")as String
 
-                                val newContact=Contacts(contactName,contactPhoneNumber)
+                                val newContact=Contacts(0,contactName,contactPhoneNumber)
 
                                 newContactList.add(newContact)
                             }

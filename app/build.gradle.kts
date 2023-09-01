@@ -72,5 +72,15 @@ dependencies {
 
     implementation("com.google.firebase:firebase-storage-ktx")
 
+    implementation("androidx.room:room-runtime:2.5.2")
+    kapt("androidx.room:room-compiler:2.5.2")
+
+    implementation("androidx.room:room-ktx:2.5.2")
+
+    implementation("com.airbnb.android:lottie:3.4.0")
+
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+
 
 }

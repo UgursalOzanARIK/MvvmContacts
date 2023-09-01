@@ -1,11 +1,14 @@
 package com.ozanarik.mvvmcontacts.ui
 
 import android.Manifest
+import android.animation.Animator
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.provider.ContactsContract.Data
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -20,9 +23,15 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.ActivityContactDetailBinding
+import com.ozanarik.mvvmcontacts.model.Contacts
+import com.ozanarik.mvvmcontacts.util.DataStoreManager
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -35,25 +44,43 @@ class ContactDetailActivity : AppCompatActivity() {
     private lateinit var imagePickerLauncher:ActivityResultLauncher<Intent>
 
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var localViewModel: RoomLocalViewModel
+
+    private lateinit var animJob:Job
+    private lateinit var dataStoreManager: DataStoreManager
 
     var selectedImg: Uri ?=null
 
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         binding = ActivityContactDetailBinding.inflate(layoutInflater)
+        val root = binding.root
+        setContentView(root)
 
-        handleActivityResultLaunchers()
 
+        animJob = Job()
 
         contactName = intent.getStringExtra("contactName")!!
         contactPhoneNumber = intent.getStringExtra("contactPhoneNumber")!!
 
 
 
+        //VIEWMODELS******************************************************************
+        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        localViewModel = ViewModelProvider(this)[RoomLocalViewModel::class.java]
+        //VIEWMODELS******************************************************************
+
+        Log.e("asd","isfav value : ${localViewModel.isFav.value}")
+
+
+        //FUNCTIONS***************************************************
         handleUserContactIntents()
         handleContactInfo()
+        handleActivityResultLaunchers()
+        //FUNCTIONS***************************************************
 
 
         binding.imgViewMore.setOnClickListener {
@@ -65,12 +92,77 @@ class ContactDetailActivity : AppCompatActivity() {
 
         }
 
-
-        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        val root = binding.root
-        setContentView(root)
+        binding.textViewAddToFav.setOnClickListener {
 
 
+            addToFavorites()
+
+
+        }
+
+    }
+
+
+    private fun handleFavAnimation(){
+
+        binding.lottieAnimation.playAnimation()
+
+
+        binding.lottieAnimation.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(p0: Animator) {
+
+
+            }
+
+            override fun onAnimationEnd(p0: Animator) {
+               binding.lottieAnimation.progress = 0.5f
+            }
+
+            override fun onAnimationCancel(p0: Animator) {
+            }
+
+            override fun onAnimationRepeat(p0: Animator) {
+            }
+        })
+
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        animJob.cancel()
+    }
+
+    private fun addToFavorites(){
+
+        val newContact = Contacts(0,contactName,contactPhoneNumber)
+
+        localViewModel.insertContact(newContact)
+
+        lifecycleScope.launch {
+
+            localViewModel.isFav.collect{isFavContact->
+
+                when(isFavContact){
+
+                    true->{
+                        handleFavAnimation()
+                        Log.e("asd",isFavContact.toString())
+
+                    }
+                    false->{
+                        Log.e("asd",isFavContact.toString())
+                    }
+                }
+
+
+
+            }
+        }
+
+
+
+        Log.e("asd","eklendi")
 
     }
 
@@ -152,7 +244,6 @@ class ContactDetailActivity : AppCompatActivity() {
                     }
                 }
                 delay(2000L)
-
             }
         }
     }

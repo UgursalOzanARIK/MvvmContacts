@@ -1,5 +1,13 @@
 package com.ozanarik.mvvmcontacts.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.io.Serializable
 
-data class Contacts(val name:String = "", val phoneNumber:String = ""):Serializable
+@Entity(tableName = "contacts_table")
+data class Contacts(
+    @PrimaryKey(autoGenerate = true)
+    val id:Int,
+    val name:String = "",
+    val phoneNumber:String = ""
+):Serializable

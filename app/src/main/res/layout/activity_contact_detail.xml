@@ -26,6 +26,30 @@
             app:srcCompat="@drawable/baseline_person_24" />
     </androidx.cardview.widget.CardView>
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieAnimation"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toTopOf="@+id/textViewAddToFav"
+        app:layout_constraintEnd_toStartOf="@+id/imageView10"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/contact_like_animation"
+        app:lottie_repeatMode="restart" />
+
+    <ImageView
+        android:layout_width="27.5dp"
+        android:layout_height="27.5dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/baseline_favorite_border_24"
+        app:layout_constraintBottom_toTopOf="@+id/textViewAddToFav"
+        app:layout_constraintEnd_toStartOf="@+id/imageView10"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
     <TextView
         android:id="@+id/textViewNameDetail"
         android:layout_width="wrap_content"
@@ -118,16 +142,6 @@
             app:srcCompat="@drawable/whatsap" />
     </androidx.cardview.widget.CardView>
 
-    <ImageView
-        android:id="@+id/imageView9"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/textViewAddToFav"
-        app:layout_constraintEnd_toStartOf="@+id/imageView10"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/baseline_favorite_border_24" />
 
     <TextView
         android:id="@+id/textViewAddToFav"
@@ -149,7 +163,7 @@
         app:layout_constraintBottom_toTopOf="@+id/textViewUpdateContact"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView9"
+        app:layout_constraintStart_toEndOf="@+id/lottieAnimation"
         app:srcCompat="@drawable/baseline_miscellaneous_services_24" />
 
     <TextView
