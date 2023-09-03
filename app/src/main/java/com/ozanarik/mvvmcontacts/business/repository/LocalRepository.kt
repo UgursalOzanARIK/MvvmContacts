@@ -11,6 +11,7 @@ import java.sql.SQLException
 
 class LocalRepository @Inject constructor(private val contactsDB: ContactsDB) {
 
+
     fun getAllContacts():Flow<Resource<List<Contacts>>> = flow{
 
         emit(Resource.Loading())
@@ -34,5 +35,6 @@ class LocalRepository @Inject constructor(private val contactsDB: ContactsDB) {
         contactsDB.getContactsDao().favoriteContact(contacts)
     }
 
+    suspend fun deleteFromContacts(contacts: Contacts) = contactsDB.getContactsDao().deleteFromContacts(contacts)
 
 }

@@ -1,15 +1,16 @@
 package com.ozanarik.mvvmcontacts.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ozanarik.mvvmcontacts.business.repository.LocalRepository
 import com.ozanarik.mvvmcontacts.model.Contacts
-import com.ozanarik.mvvmcontacts.util.DataStoreManager
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,15 +22,20 @@ class RoomLocalViewModel @Inject constructor (application: Application,private v
     private val _localContactsData:MutableStateFlow<Resource<List<Contacts>>> = MutableStateFlow(Resource.Loading())
     val localContactsData:StateFlow<Resource<List<Contacts>>> = _localContactsData
 
-    val dataStoreManager = DataStoreManager(application)
-
 
     private val _isFav:MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isFav:StateFlow<Boolean> = _isFav
 
+    private val dataStoreManager = DatastoreManager(application)
+
+
+    fun setFavContactText(isFav:Boolean) = viewModelScope.launch { dataStoreManager.setFavContactText(isFav) }
+
+    fun getFavContact() = viewModelScope.launch {
+
+    }
 
     fun getAllContacts()= viewModelScope.launch {
-
 
         localRepository.getAllContacts().collect{contactList->
 
@@ -52,14 +58,7 @@ class RoomLocalViewModel @Inject constructor (application: Application,private v
     fun insertContact(contacts: Contacts) = viewModelScope.launch {
 
         localRepository.insertContact(contacts)
-        _isFav.value = true
-
-        val isFavouriteContact = _isFav.value
-
-        dataStoreManager.setFavContact(isFavouriteContact)
+        setFavContactText(true)
     }
-
-
-
 
 }

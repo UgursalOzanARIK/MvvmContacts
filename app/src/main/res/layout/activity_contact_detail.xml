@@ -26,29 +26,6 @@
             app:srcCompat="@drawable/baseline_person_24" />
     </androidx.cardview.widget.CardView>
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieAnimation"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:layout_constraintBottom_toTopOf="@+id/textViewAddToFav"
-        app:layout_constraintEnd_toStartOf="@+id/imageView10"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:lottie_autoPlay="false"
-        app:lottie_loop="false"
-        app:lottie_rawRes="@raw/contact_like_animation"
-        app:lottie_repeatMode="restart" />
-
-    <ImageView
-        android:layout_width="27.5dp"
-        android:layout_height="27.5dp"
-        android:layout_marginBottom="10dp"
-        android:src="@drawable/baseline_favorite_border_24"
-        app:layout_constraintBottom_toTopOf="@+id/textViewAddToFav"
-        app:layout_constraintEnd_toStartOf="@+id/imageView10"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
-
 
     <TextView
         android:id="@+id/textViewNameDetail"
@@ -156,14 +133,14 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView10"
+        android:id="@+id/imageViewUpdate"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/textViewUpdateContact"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/lottieAnimation"
+        app:layout_constraintStart_toEndOf="@+id/imageViewFav"
         app:srcCompat="@drawable/baseline_miscellaneous_services_24" />
 
     <TextView
@@ -188,5 +165,16 @@
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewNameDetail" />
+
+    <ImageView
+        android:id="@+id/imageViewFav"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/textViewAddToFav"
+        app:layout_constraintEnd_toStartOf="@+id/imageViewUpdate"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/baseline_favorite_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

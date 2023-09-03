@@ -226,7 +226,7 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
                         for (document in querySnapshot ){
 
                             document.reference.delete()
-                            Log.e("aaa","deleted ${document.id}")
+                            Log.e("success","deleted ${document.id} : $contactName")
                             _deleteFromFireStoreStateFlow.value = Resource.Success(Unit)
                         }
                     }.addOnFailureListener {exception->

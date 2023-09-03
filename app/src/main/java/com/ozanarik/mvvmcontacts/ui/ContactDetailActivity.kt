@@ -1,14 +1,14 @@
 package com.ozanarik.mvvmcontacts.ui
 
 import android.Manifest
-import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.provider.ContactsContract.Data
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -24,14 +24,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.ActivityContactDetailBinding
 import com.ozanarik.mvvmcontacts.model.Contacts
-import com.ozanarik.mvvmcontacts.util.DataStoreManager
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -47,7 +43,6 @@ class ContactDetailActivity : AppCompatActivity() {
     private lateinit var localViewModel: RoomLocalViewModel
 
     private lateinit var animJob:Job
-    private lateinit var dataStoreManager: DataStoreManager
 
     var selectedImg: Uri ?=null
 
@@ -65,7 +60,6 @@ class ContactDetailActivity : AppCompatActivity() {
 
         contactName = intent.getStringExtra("contactName")!!
         contactPhoneNumber = intent.getStringExtra("contactPhoneNumber")!!
-
 
 
         //VIEWMODELS******************************************************************
@@ -89,49 +83,50 @@ class ContactDetailActivity : AppCompatActivity() {
 
         binding.cardViewContact.setOnClickListener {
             pickImageForContact()
-
         }
 
         binding.textViewAddToFav.setOnClickListener {
 
-
             addToFavorites()
 
+        }
+    }
 
+
+    private fun handleFavAnimation(isFav:Boolean){
+
+        val scaleXValue = "scaleX"
+        val scaleYValue = "scaleY"
+        val targetObj = binding.imageViewFav
+
+        val scaleX = ObjectAnimator.ofFloat(targetObj,scaleXValue,1.0f,1.5f).apply {
+            repeatCount = 1
+            repeatMode = ObjectAnimator.REVERSE
+        }
+        val scaleY = ObjectAnimator.ofFloat(targetObj,scaleYValue,1.0f,1.5f).apply {
+            repeatCount = 1
+            repeatMode = ObjectAnimator.REVERSE
         }
 
-    }
+        val multiAnim = AnimatorSet().apply {
+            duration = 200L
+            playTogether(scaleY,scaleX)
+        }.start()
 
-
-    private fun handleFavAnimation(){
-
-        binding.lottieAnimation.playAnimation()
-
-
-        binding.lottieAnimation.addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(p0: Animator) {
-
-
-            }
-
-            override fun onAnimationEnd(p0: Animator) {
-               binding.lottieAnimation.progress = 0.5f
-            }
-
-            override fun onAnimationCancel(p0: Animator) {
-            }
-
-            override fun onAnimationRepeat(p0: Animator) {
-            }
-        })
+        if(isFav){
+            targetObj.setColorFilter(Color.RED)
+        }else if (!isFav){
+            targetObj.setColorFilter(Color.WHITE)
+        }
 
 
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onDestroy() {
+        super.onDestroy()
         animJob.cancel()
     }
+
 
     private fun addToFavorites(){
 
@@ -141,29 +136,11 @@ class ContactDetailActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
 
-            localViewModel.isFav.collect{isFavContact->
+                localViewModel.getFavContact()
 
-                when(isFavContact){
-
-                    true->{
-                        handleFavAnimation()
-                        Log.e("asd",isFavContact.toString())
-
-                    }
-                    false->{
-                        Log.e("asd",isFavContact.toString())
-                    }
-                }
-
-
-
-            }
         }
 
-
-
         Log.e("asd","eklendi")
-
     }
 
 
@@ -177,11 +154,9 @@ class ContactDetailActivity : AppCompatActivity() {
 
            when(item.itemId){
                R.id.action_Delete->{
-                   Log.e("asdasd","deleted $contactName")
-
+                   Log.e("contactDeleted","deleted $contactName")
 
                    deleteContactAlertDialog()
-
 
                    true
                }
@@ -192,7 +167,6 @@ class ContactDetailActivity : AppCompatActivity() {
                    false
                }
            }
-
 
        }
 
@@ -352,6 +326,11 @@ class ContactDetailActivity : AppCompatActivity() {
 
             startActivity(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        handleFavAnimation(localViewModel.isFav.value)
     }
 
 
