@@ -18,17 +18,23 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.ActivityContactDetailBinding
 import com.ozanarik.mvvmcontacts.model.Contacts
+import com.ozanarik.mvvmcontacts.util.DatastoreManager
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ContactDetailActivity : AppCompatActivity() {
@@ -47,8 +53,6 @@ class ContactDetailActivity : AppCompatActivity() {
     var selectedImg: Uri ?=null
 
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContactDetailBinding.inflate(layoutInflater)
@@ -58,8 +62,16 @@ class ContactDetailActivity : AppCompatActivity() {
 
         animJob = Job()
 
-        contactName = intent.getStringExtra("contactName")!!
-        contactPhoneNumber = intent.getStringExtra("contactPhoneNumber")!!
+
+        //FUNCTIONS***************************************************
+        handleUserContactIntents()
+        handleContactInfo()
+        handleActivityResultLaunchers()
+        getFavContact()
+        getIntentContactData()
+        handleContactDetailImageViewButtonClicks()
+        //FUNCTIONS***************************************************
+
 
 
         //VIEWMODELS******************************************************************
@@ -67,16 +79,11 @@ class ContactDetailActivity : AppCompatActivity() {
         localViewModel = ViewModelProvider(this)[RoomLocalViewModel::class.java]
         //VIEWMODELS******************************************************************
 
-        Log.e("asd","isfav value : ${localViewModel.isFav.value}")
 
 
-        //FUNCTIONS***************************************************
-        handleUserContactIntents()
-        handleContactInfo()
-        handleActivityResultLaunchers()
-        //FUNCTIONS***************************************************
+    }
 
-
+    private fun handleContactDetailImageViewButtonClicks(){
         binding.imgViewMore.setOnClickListener {
             handlePopUpMenuForDeleteShareContact()
         }
@@ -88,11 +95,37 @@ class ContactDetailActivity : AppCompatActivity() {
         binding.textViewAddToFav.setOnClickListener {
 
             addToFavorites()
-
         }
     }
 
 
+    private fun getIntentContactData(){
+
+        contactName = intent.getStringExtra("contactName")!!
+        contactPhoneNumber = intent.getStringExtra("contactPhoneNumber")!!
+    }
+
+
+    private fun getFavContact(){
+        lifecycleScope.launch {
+
+            localViewModel.getFavContactBool().observe(this@ContactDetailActivity, Observer {isFavContact->
+
+                when(isFavContact){
+                    true->{
+                        Log.e("asd","viewmodel get favcontact function değeri : $isFavContact")
+                        handleFavAnimation(true)
+                        binding.textViewAddToFav.text = "Delete From Favourites"
+                    }
+                    false->{
+                        Log.e("asd","viewmodel get favcontact function değeri : $isFavContact")
+                        handleFavAnimation(false)
+                        binding.textViewAddToFav.text = "Add To Favourites"
+                    }
+                }
+            })
+        }
+    }
     private fun handleFavAnimation(isFav:Boolean){
 
         val scaleXValue = "scaleX"
@@ -113,20 +146,14 @@ class ContactDetailActivity : AppCompatActivity() {
             playTogether(scaleY,scaleX)
         }.start()
 
+
         if(isFav){
             targetObj.setColorFilter(Color.RED)
-        }else if (!isFav){
+
+        }else{
             targetObj.setColorFilter(Color.WHITE)
         }
-
-
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        animJob.cancel()
-    }
-
 
     private fun addToFavorites(){
 
@@ -135,14 +162,24 @@ class ContactDetailActivity : AppCompatActivity() {
         localViewModel.insertContact(newContact)
 
         lifecycleScope.launch {
-
-                localViewModel.getFavContact()
-
+            localViewModel.isFav.collect{isFavContact->
+                when(isFavContact){
+                    true->{
+                        localViewModel.saveFavContactBool(true)
+                        handleFavAnimation(true)
+                        Log.e("asd","${isFavContact.toString()} : isfavcontact viewmodelda ki stateflow")
+                        Log.e("asd","contact detail datastoredan çekilen bool : true")
+                    }
+                    false->{
+                        localViewModel.saveFavContactBool(false)
+                        handleFavAnimation(false)
+                        Log.e("asd","{isFavContact.toString()} : isfavcontact viewmodelda ki stateflow")
+                        Log.e("asd","contact detail datastoredan çekilen bool : false")
+                    }
+                }
+            }
         }
-
-        Log.e("asd","eklendi")
     }
-
 
    private fun handlePopUpMenuForDeleteShareContact(){
 
@@ -167,9 +204,7 @@ class ContactDetailActivity : AppCompatActivity() {
                    false
                }
            }
-
        }
-
        popupMenu.show()
    }
 
@@ -192,12 +227,9 @@ class ContactDetailActivity : AppCompatActivity() {
 
                 finish()
             }
-
-
             create().show()
         }
     }
-
 
     private fun deleteContactFromFireStore(){
         mainViewModel.deleteFireStoreContact(contactName,contactPhoneNumber)
@@ -206,7 +238,6 @@ class ContactDetailActivity : AppCompatActivity() {
 
             mainViewModel.deleteFromFireStoreStateFlow.collect{hasDeleted->
                 when(hasDeleted){
-
                     is Resource.Success->{
                         Snackbar.make(binding.imgViewMore,"$contactName deleted from database!",Snackbar.LENGTH_LONG).show()
                     }
@@ -232,7 +263,6 @@ class ContactDetailActivity : AppCompatActivity() {
         val intentChooser = Intent.createChooser(intent,"Share Contact Information")
 
         startActivity(intentChooser)
-
     }
 
     private fun pickImageForContact(){
@@ -254,10 +284,7 @@ class ContactDetailActivity : AppCompatActivity() {
         }
     }
 
-
     private fun handleActivityResultLaunchers(){
-
-
         imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){activityResult->
 
             if(activityResult.resultCode == RESULT_OK){
@@ -297,41 +324,60 @@ class ContactDetailActivity : AppCompatActivity() {
 
         binding.cardViewWhatsapp.setOnClickListener {
 
-            try {
-                val uriParseWhatsapp = Uri.parse("https://api.whatsapp.com/send?phone=$contactPhoneNumber")
-
-                val intent = Intent(Intent.ACTION_VIEW,uriParseWhatsapp)
-
-                startActivity(intent)
-
-            }catch (e:Exception){
-                Snackbar.make(binding.cardViewWhatsapp,e.localizedMessage!!,Snackbar.LENGTH_LONG).show()
-            }
+            whatsappSendIntent()
 
         }
 
         binding.cardViewCall.setOnClickListener {
 
-            val uriParseTel = Uri.parse("tel:${contactPhoneNumber}")
-            val intent = Intent(Intent.ACTION_DIAL,uriParseTel)
-
-            startActivity(intent)
-
+            callIntent()
         }
 
         binding.cardViewMessage.setOnClickListener {
+            messageIntent()
+        }
+    }
 
-            val uriParseTel = Uri.parse("smsto:${contactPhoneNumber}")
-            val intent = Intent(Intent.ACTION_SENDTO,uriParseTel)
+    private fun callIntent(){
+        val uriParseTel = Uri.parse("tel:${contactPhoneNumber}")
+        val intent = Intent(Intent.ACTION_DIAL,uriParseTel)
+
+        startActivity(intent)
+    }
+    private fun messageIntent(){
+
+        val uriParseTel = Uri.parse("smsto:${contactPhoneNumber}")
+        val intent = Intent(Intent.ACTION_SENDTO,uriParseTel)
+
+        startActivity(intent)
+    }
+
+    private fun whatsappSendIntent(){
+        try {
+            val uriParseWhatsapp = Uri.parse("https://api.whatsapp.com/send?phone=$contactPhoneNumber")
+
+            val intent = Intent(Intent.ACTION_VIEW,uriParseWhatsapp)
 
             startActivity(intent)
+
+        }catch (e:Exception){
+            Snackbar.make(binding.cardViewWhatsapp,e.localizedMessage!!,Snackbar.LENGTH_LONG).show()
         }
+
     }
 
     override fun onResume() {
         super.onResume()
         handleFavAnimation(localViewModel.isFav.value)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.imageViewContactPhoto.setImageBitmap(null)
+        binding.textViewAddToFav.setOnClickListener (null)
+        animJob.cancel()
+    }
+
 
 
 

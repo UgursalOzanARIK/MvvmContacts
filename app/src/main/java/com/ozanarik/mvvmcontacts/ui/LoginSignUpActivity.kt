@@ -34,8 +34,6 @@ class LoginSignUpActivity : AppCompatActivity() {
 
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
-
-
         binding.buttonSignUp.setOnClickListener {
 
             val email = binding.editTextEmail.text.toString()
@@ -44,8 +42,6 @@ class LoginSignUpActivity : AppCompatActivity() {
             signUp(email,password)
             }
         }
-
-
 
     fun signUp(email:String,password:String){
 

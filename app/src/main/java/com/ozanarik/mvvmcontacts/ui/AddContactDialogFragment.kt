@@ -34,9 +34,6 @@ class AddContactDialogFragment : DialogFragment(){
 
         binding = FragmentAddContactDialogBinding.inflate(inflater,container,false)
 
-
-
-
         binding.buttonSaveContact.setOnClickListener {
 
             saveContactToFireStore()
@@ -46,12 +43,10 @@ class AddContactDialogFragment : DialogFragment(){
         return binding.root
     }
 
-
-
     private fun saveContactToFireStore(){
 
-        val contactName = binding.editTextNameToAdd.text.toString()
-        val contactPhoneNumber = binding.editTextTextPhoneToAdd.text.toString()
+        val contactName = binding.editTextNameToAdd.text.toString().trim()
+        val contactPhoneNumber = binding.editTextTextPhoneToAdd.text.toString().trim()
 
         if(contactName.isNotEmpty() && contactPhoneNumber.isNotEmpty()){
 

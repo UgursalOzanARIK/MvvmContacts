@@ -101,7 +101,7 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
 
     }
 
-    fun signUpUser(email:String,password:String):Resource<Unit> {
+    private fun signUpUser(email:String, password:String):Resource<Unit> {
 
         try {
 

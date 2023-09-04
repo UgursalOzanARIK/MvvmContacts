@@ -3,11 +3,14 @@ package com.ozanarik.mvvmcontacts.ui
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.ozanarik.mvvmcontacts.business.repository.LocalRepository
 import com.ozanarik.mvvmcontacts.model.Contacts
+import com.ozanarik.mvvmcontacts.util.DatastoreManager
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
@@ -15,7 +18,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RoomLocalViewModel @Inject constructor (application: Application,private val localRepository: LocalRepository)
+class RoomLocalViewModel @Inject constructor
+                    (
+
+        private val datastoreManager: DatastoreManager,
+        application: Application,
+        private val localRepository: LocalRepository
+
+                    )
 
     :AndroidViewModel(application){
 
@@ -26,14 +36,13 @@ class RoomLocalViewModel @Inject constructor (application: Application,private v
     private val _isFav:MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isFav:StateFlow<Boolean> = _isFav
 
-    private val dataStoreManager = DatastoreManager(application)
 
 
-    fun setFavContactText(isFav:Boolean) = viewModelScope.launch { dataStoreManager.setFavContactText(isFav) }
-
-    fun getFavContact() = viewModelScope.launch {
-
+    fun saveFavContactBool(isFavContact:Boolean) = viewModelScope.launch {
+        datastoreManager.saveFavContact(isFavContact)
     }
+
+    fun getFavContactBool() = datastoreManager.getSavedFavContact().asLiveData(Dispatchers.IO)
 
     fun getAllContacts()= viewModelScope.launch {
 
@@ -57,8 +66,8 @@ class RoomLocalViewModel @Inject constructor (application: Application,private v
 
     fun insertContact(contacts: Contacts) = viewModelScope.launch {
 
+        _isFav.value = !_isFav.value
         localRepository.insertContact(contacts)
-        setFavContactText(true)
     }
 
 }
