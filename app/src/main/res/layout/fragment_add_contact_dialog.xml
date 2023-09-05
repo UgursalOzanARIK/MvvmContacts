@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".ui.AddContactDialogFragment"
+    tools:context=".ui.fragments.AddContactDialogFragment"
     android:background="@drawable/addcontactbg"
     android:padding="16dp">
 

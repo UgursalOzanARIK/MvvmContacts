@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginSignUpActivity : AppCompatActivity() {
-    lateinit var mainViewModel: MainViewModel
+    private lateinit var mainViewModel: MainViewModel
 
     private lateinit var auth: FirebaseAuth
     private lateinit var binding: ActivityLoginSignUpBinding
@@ -41,7 +41,7 @@ class LoginSignUpActivity : AppCompatActivity() {
             }
         }
 
-    fun signUp(email:String,password:String){
+    private fun signUp(email:String, password:String){
 
         mainViewModel.signUp(email,password)
 
@@ -53,9 +53,8 @@ class LoginSignUpActivity : AppCompatActivity() {
                     is Resource.Success->{
                         //RECYCLERVIEW TO BE UPDATED
                         Snackbar.make(binding.buttonSignUp,"helal lan",Snackbar.LENGTH_LONG).show()
-                        startActivity(Intent(this@LoginSignUpActivity,ContactsActivity::class.java))
+                        startActivity(Intent(this@LoginSignUpActivity,MainActivity::class.java))
                         finish()
-
                     }
                     is Resource.Error->{
                         Snackbar.make(binding.buttonSignUp,result.message.toString(),Snackbar.LENGTH_LONG).show()
@@ -73,7 +72,7 @@ class LoginSignUpActivity : AppCompatActivity() {
 
     private fun handleCurrentUser(){
         if(auth.currentUser!=null){
-            startActivity(Intent(this@LoginSignUpActivity,ContactsActivity::class.java))
+            startActivity(Intent(this@LoginSignUpActivity,MainActivity::class.java))
             finish()
         }
 

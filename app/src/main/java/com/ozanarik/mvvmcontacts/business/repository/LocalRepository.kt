@@ -35,6 +35,8 @@ class LocalRepository @Inject constructor(private val contactsDB: ContactsDB) {
         contactsDB.getContactsDao().favoriteContact(contacts)
     }
 
+    suspend fun updateFavStatus(id:Long,isFav:Boolean) = contactsDB.getContactsDao().updateFavStatus(id,isFav)
+
     suspend fun deleteFromContacts(contacts: Contacts) = contactsDB.getContactsDao().deleteFromContacts(contacts)
 
 }

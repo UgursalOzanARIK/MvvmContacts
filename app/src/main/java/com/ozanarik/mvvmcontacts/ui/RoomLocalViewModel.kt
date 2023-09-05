@@ -3,6 +3,7 @@ package com.ozanarik.mvvmcontacts.ui
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.ozanarik.mvvmcontacts.business.repository.LocalRepository
@@ -22,12 +23,11 @@ class RoomLocalViewModel @Inject constructor
                     (
 
         private val datastoreManager: DatastoreManager,
-        application: Application,
         private val localRepository: LocalRepository
 
                     )
 
-    :AndroidViewModel(application){
+    :ViewModel(){
 
     private val _localContactsData:MutableStateFlow<Resource<List<Contacts>>> = MutableStateFlow(Resource.Loading())
     val localContactsData:StateFlow<Resource<List<Contacts>>> = _localContactsData
@@ -35,8 +35,6 @@ class RoomLocalViewModel @Inject constructor
 
     private val _isFav:MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isFav:StateFlow<Boolean> = _isFav
-
-
 
     fun saveFavContactBool(isFavContact:Boolean) = viewModelScope.launch {
         datastoreManager.saveFavContact(isFavContact)
@@ -63,10 +61,13 @@ class RoomLocalViewModel @Inject constructor
         }
     }
 
+    fun updateFavStatus(id:Long,isFav:Boolean) = viewModelScope.launch {
+        localRepository.updateFavStatus(id,isFav)
+    }
+
 
     fun insertContact(contacts: Contacts) = viewModelScope.launch {
 
-        _isFav.value = !_isFav.value
         localRepository.insertContact(contacts)
     }
 

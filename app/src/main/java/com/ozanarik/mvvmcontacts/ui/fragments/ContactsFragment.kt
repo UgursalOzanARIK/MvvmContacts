@@ -1,21 +1,26 @@
-package com.ozanarik.mvvmcontacts.ui
+package com.ozanarik.mvvmcontacts.ui.fragments
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
 import com.ozanarik.mvvmcontacts.R
-import com.ozanarik.mvvmcontacts.databinding.ActivityMainBinding
+import com.ozanarik.mvvmcontacts.databinding.FragmentContactsBinding
+import com.ozanarik.mvvmcontacts.ui.MainViewModel
 import com.ozanarik.mvvmcontacts.ui.adapter.ContactsAdapter
 import com.ozanarik.mvvmcontacts.util.AdapterItemClickListener
 import com.ozanarik.mvvmcontacts.util.Resource
@@ -23,21 +28,29 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ContactsActivity : AppCompatActivity(){
+class ContactsFragment : Fragment() {
+
     private lateinit var firestore: FirebaseFirestore
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: FragmentContactsBinding
     private lateinit var auth: FirebaseAuth
-    private lateinit var mainViewModel: MainViewModel
-    private lateinit var contactsAdapter:ContactsAdapter
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        val root = binding.root
-        setContentView(root)
-        handleRecyclerView()
+    private lateinit var contactsAdapter: ContactsAdapter
+
+    private val mainViewModel:MainViewModel by viewModels()
 
 
-        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        binding = FragmentContactsBinding.inflate(inflater,container,false)
+
+        // Inflate the layout for this fragment
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         firestore = Firebase.firestore
         auth = Firebase.auth
@@ -46,16 +59,15 @@ class ContactsActivity : AppCompatActivity(){
         binding.floatingActionButton.setOnClickListener {
 
             //addContact
-            AddContactDialogFragment().show(supportFragmentManager,AddContactDialogFragment().tag)
+            AddContactDialogFragment().show((activity as AppCompatActivity).supportFragmentManager,
+                AddContactDialogFragment().tag)
         }
-
     }
-
 
     private fun readFireStoreContacts(){
 
         mainViewModel.readFireStoreContactData()
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
 
             mainViewModel.readFireStoreDataState.collect{resultData->
                 when(resultData){
@@ -63,13 +75,12 @@ class ContactsActivity : AppCompatActivity(){
                         resultData?.let { contactsAdapter.differList.submitList(it.data) }
                         contactsAdapter.notifyDataSetChanged()
                         Log.e("asdas","got data")
-
                     }
                     is Resource.Loading->{
                         Log.e("asd","loading")
                     }
                     is Resource.Error->{
-                        Toast.makeText(this@ContactsActivity,resultData.message,Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(),resultData.message, Toast.LENGTH_LONG).show()
                         Log.e("asd","asdasd")
                     }
                 }
@@ -83,30 +94,23 @@ class ContactsActivity : AppCompatActivity(){
 
                 val currentContact = contactsAdapter.differList.currentList[position]
 
-                val intent = Intent(this@ContactsActivity,ContactDetailActivity::class.java)
+                val bundle = bundleOf("contact" to currentContact)
 
-                intent.putExtra("contactName",currentContact.name)
-                intent.putExtra("contactPhoneNumber",currentContact.phoneNumber)
+                findNavController().navigate(R.id.action_action_Contacts_to_contactDetailFragment,bundle)
 
-                startActivity(intent)
             }
         })
-
         binding.contactRv.apply {
 
-            layoutManager = LinearLayoutManager(this@ContactsActivity)
+            layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
             adapter = contactsAdapter
-            firestoreSettings { setRecyclerListener { binding.contactRv } }
-
         }
     }
-
 
     override fun onResume() {
         readFireStoreContacts()
         handleRecyclerView()
         super.onResume()
     }
-
 }

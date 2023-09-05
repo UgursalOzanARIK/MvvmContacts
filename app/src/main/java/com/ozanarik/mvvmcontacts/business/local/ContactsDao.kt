@@ -20,6 +20,8 @@ interface ContactsDao {
     @Delete
     suspend fun deleteFromContacts(contacts: Contacts)
 
+    @Query("UPDATE contacts_table SET isFavourite=:isFavourite WHERE id = :id")
+    suspend fun updateFavStatus(id:Long,isFavourite:Boolean)
 
 
 }

@@ -98,7 +98,6 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
         }
 
         return Resource.Loading()
-
     }
 
     private fun signUpUser(email:String, password:String):Resource<Unit> {
@@ -119,14 +118,9 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
 
 
         return Resource.Success(Unit)
-
     }
 
-
-
 fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Resource<Unit>{
-
-
     try {
         val currentUserUID = auth.currentUser?.uid
 
@@ -153,7 +147,6 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
                 _uploadContactToFireStoreState.value = Resource.Error(it.localizedMessage!!)
             }
         }
-
 
     }catch (e:Exception) {
 

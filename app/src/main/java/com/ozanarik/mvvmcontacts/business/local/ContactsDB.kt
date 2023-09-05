@@ -6,8 +6,7 @@ import com.ozanarik.mvvmcontacts.model.Contacts
 
 @Database(
     entities = [Contacts::class],
-    version = 1,
-    exportSchema = false
+    version = 2,
         )
 
 abstract class ContactsDB:RoomDatabase() {

@@ -1,9 +1,8 @@
-package com.ozanarik.mvvmcontacts.ui
+package com.ozanarik.mvvmcontacts.ui.fragments
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.ozanarik.mvvmcontacts.databinding.FragmentAddContactDialogBinding
-import com.ozanarik.mvvmcontacts.ui.adapter.ContactsAdapter
-import com.ozanarik.mvvmcontacts.util.AdapterItemClickListener
+import com.ozanarik.mvvmcontacts.ui.MainViewModel
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

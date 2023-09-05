@@ -19,9 +19,7 @@ class DatastoreManager @Inject constructor (context:Context) {
     private val dataStore = context.dataStore
 
     companion object{
-
         private val isFavContactKey = booleanPreferencesKey("isFavouriteContact")
-
     }
 
     suspend fun saveFavContact(isFavContactBool:Boolean){
