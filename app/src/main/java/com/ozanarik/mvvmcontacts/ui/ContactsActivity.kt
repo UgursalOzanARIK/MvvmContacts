@@ -8,26 +8,22 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.firestoreSettings
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.ActivityMainBinding
-import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.ui.adapter.ContactsAdapter
 import com.ozanarik.mvvmcontacts.util.AdapterItemClickListener
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(){
+class ContactsActivity : AppCompatActivity(){
     private lateinit var firestore: FirebaseFirestore
     private lateinit var binding: ActivityMainBinding
     private lateinit var auth: FirebaseAuth
@@ -48,7 +44,6 @@ class MainActivity : AppCompatActivity(){
         readFireStoreContacts()
 
         binding.floatingActionButton.setOnClickListener {
-
 
             //addContact
             AddContactDialogFragment().show(supportFragmentManager,AddContactDialogFragment().tag)
@@ -74,7 +69,7 @@ class MainActivity : AppCompatActivity(){
                         Log.e("asd","loading")
                     }
                     is Resource.Error->{
-                        Toast.makeText(this@MainActivity,resultData.message,Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@ContactsActivity,resultData.message,Toast.LENGTH_LONG).show()
                         Log.e("asd","asdasd")
                     }
                 }
@@ -88,7 +83,7 @@ class MainActivity : AppCompatActivity(){
 
                 val currentContact = contactsAdapter.differList.currentList[position]
 
-                val intent = Intent(this@MainActivity,ContactDetailActivity::class.java)
+                val intent = Intent(this@ContactsActivity,ContactDetailActivity::class.java)
 
                 intent.putExtra("contactName",currentContact.name)
                 intent.putExtra("contactPhoneNumber",currentContact.phoneNumber)
@@ -99,7 +94,7 @@ class MainActivity : AppCompatActivity(){
 
         binding.contactRv.apply {
 
-            layoutManager = LinearLayoutManager(this@MainActivity)
+            layoutManager = LinearLayoutManager(this@ContactsActivity)
             setHasFixedSize(true)
             adapter = contactsAdapter
             firestoreSettings { setRecyclerListener { binding.contactRv } }

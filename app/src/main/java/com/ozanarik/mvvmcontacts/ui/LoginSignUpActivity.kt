@@ -9,12 +9,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.ActivityLoginSignUpBinding
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlin.math.sign
 
 @AndroidEntryPoint
 class LoginSignUpActivity : AppCompatActivity() {
@@ -55,7 +53,7 @@ class LoginSignUpActivity : AppCompatActivity() {
                     is Resource.Success->{
                         //RECYCLERVIEW TO BE UPDATED
                         Snackbar.make(binding.buttonSignUp,"helal lan",Snackbar.LENGTH_LONG).show()
-                        startActivity(Intent(this@LoginSignUpActivity,MainActivity::class.java))
+                        startActivity(Intent(this@LoginSignUpActivity,ContactsActivity::class.java))
                         finish()
 
                     }
@@ -75,7 +73,7 @@ class LoginSignUpActivity : AppCompatActivity() {
 
     private fun handleCurrentUser(){
         if(auth.currentUser!=null){
-            startActivity(Intent(this@LoginSignUpActivity,MainActivity::class.java))
+            startActivity(Intent(this@LoginSignUpActivity,ContactsActivity::class.java))
             finish()
         }
 

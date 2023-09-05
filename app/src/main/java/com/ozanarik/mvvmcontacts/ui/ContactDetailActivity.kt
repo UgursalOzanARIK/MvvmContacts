@@ -59,19 +59,7 @@ class ContactDetailActivity : AppCompatActivity() {
         val root = binding.root
         setContentView(root)
 
-
         animJob = Job()
-
-
-        //FUNCTIONS***************************************************
-        handleUserContactIntents()
-        handleContactInfo()
-        handleActivityResultLaunchers()
-        getFavContact()
-        getIntentContactData()
-        handleContactDetailImageViewButtonClicks()
-        //FUNCTIONS***************************************************
-
 
 
         //VIEWMODELS******************************************************************
@@ -79,6 +67,15 @@ class ContactDetailActivity : AppCompatActivity() {
         localViewModel = ViewModelProvider(this)[RoomLocalViewModel::class.java]
         //VIEWMODELS******************************************************************
 
+
+        //FUNCTIONS***************************************************
+        handleUserContactIntents()
+        getIntentContactData()
+        handleContactInfo()
+        handleActivityResultLaunchers()
+        getFavContact()
+        handleContactDetailImageViewButtonClicks()
+        //FUNCTIONS***************************************************
 
 
     }
@@ -97,7 +94,6 @@ class ContactDetailActivity : AppCompatActivity() {
             addToFavorites()
         }
     }
-
 
     private fun getIntentContactData(){
 
@@ -212,7 +208,6 @@ class ContactDetailActivity : AppCompatActivity() {
 
         val ad = AlertDialog.Builder(this).apply {
 
-
             setMessage("Are you sure you want to delete $contactName ?")
             setTitle("Delete Contact")
             setIcon(R.drawable.baseline_delete_24)
@@ -222,9 +217,7 @@ class ContactDetailActivity : AppCompatActivity() {
                 Toast.makeText(this@ContactDetailActivity,"Dismissed",Toast.LENGTH_LONG).show()
             }
             setPositiveButton("Yes"){dialogInterface,i->
-
                 deleteContactFromFireStore()
-
                 finish()
             }
             create().show()
@@ -233,7 +226,6 @@ class ContactDetailActivity : AppCompatActivity() {
 
     private fun deleteContactFromFireStore(){
         mainViewModel.deleteFireStoreContact(contactName,contactPhoneNumber)
-
         lifecycleScope.launch {
 
             mainViewModel.deleteFromFireStoreStateFlow.collect{hasDeleted->
@@ -292,9 +284,7 @@ class ContactDetailActivity : AppCompatActivity() {
                 val intentData = activityResult.data
 
                 if(intentData!=null){
-
                     selectedImg = intentData.data
-
                     selectedImg?.let { binding.imageViewContactPhoto.setImageURI(it) }
                 }
             }
@@ -305,7 +295,6 @@ class ContactDetailActivity : AppCompatActivity() {
             when(isGranted){
                 true->{
                     imagePickerLauncher.launch(Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI))
-
                 }
                 false->{
                     Snackbar.make(binding.cardViewContact,"Please grant permission to be able to pick a photo for your contact",Snackbar.LENGTH_LONG).show()
@@ -313,7 +302,6 @@ class ContactDetailActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun handleContactInfo(){
         binding.textViewNameDetail.text = contactName
@@ -377,8 +365,4 @@ class ContactDetailActivity : AppCompatActivity() {
         binding.textViewAddToFav.setOnClickListener (null)
         animJob.cancel()
     }
-
-
-
-
 }
