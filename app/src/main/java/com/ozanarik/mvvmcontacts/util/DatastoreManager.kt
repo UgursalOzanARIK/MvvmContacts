@@ -39,8 +39,6 @@ class DatastoreManager @Inject constructor (context:Context) {
             }
         }.map { appPrefs->
             val yourFavContact = appPrefs[isFavContactKey]?:false
-            Log.e("asd","datastore boolu aldım : ${yourFavContact.toString()}")
-
             yourFavContact
         }
     }
