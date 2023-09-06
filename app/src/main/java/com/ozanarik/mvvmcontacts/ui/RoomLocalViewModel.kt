@@ -61,13 +61,9 @@ class RoomLocalViewModel @Inject constructor
         }
     }
 
-    fun updateFavStatus(id:Long,isFav:Boolean) = viewModelScope.launch {
-        localRepository.updateFavStatus(id,isFav)
-    }
-
-
     fun insertContact(contacts: Contacts) = viewModelScope.launch {
 
+        _isFav.value = true
         localRepository.insertContact(contacts)
     }
 

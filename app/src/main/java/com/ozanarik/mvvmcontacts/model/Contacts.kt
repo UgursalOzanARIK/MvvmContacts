@@ -10,5 +10,5 @@ data class Contacts(
     val id:Long,
     val name:String = "",
     val phoneNumber:String = "",
-    val isFavourite:Boolean = false
+    var isFav:Boolean = false
 ):Serializable

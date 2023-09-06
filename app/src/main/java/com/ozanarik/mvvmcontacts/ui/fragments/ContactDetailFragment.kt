@@ -23,7 +23,9 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
@@ -32,8 +34,10 @@ import com.ozanarik.mvvmcontacts.databinding.FragmentContactDetailBinding
 import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.ui.MainViewModel
 import com.ozanarik.mvvmcontacts.ui.RoomLocalViewModel
+import com.ozanarik.mvvmcontacts.util.DatastoreManager
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -49,6 +53,8 @@ class ContactDetailFragment : Fragment() {
 
     private lateinit var localViewModel: RoomLocalViewModel
     private lateinit var mainViewModel: MainViewModel
+
+    private lateinit var datastoreManager: DatastoreManager
 
     private lateinit var animJob: Job
 
@@ -72,7 +78,8 @@ class ContactDetailFragment : Fragment() {
 
 
 
-
+        val contactArgs:ContactDetailFragmentArgs by navArgs()
+        val currentContact = contactArgs.contact
 
         animJob = Job()
 
@@ -113,16 +120,38 @@ class ContactDetailFragment : Fragment() {
     private fun getFavContact(){
 
         val contactArgs:ContactDetailFragmentArgs by navArgs()
-
         val currentContact = contactArgs.contact
-        if(currentContact.isFavourite == true){
-            handleFavAnimation(true)
-            Log.e("asd","${currentContact.id} ${currentContact.name} ${currentContact.isFavourite}")
-        }else {
-            handleFavAnimation(false)
-            Log.e("asd","${currentContact.id} ${currentContact.name} ${currentContact.isFavourite}")
 
-        }
+
+        localViewModel.getFavContactBool().observe(requireActivity(), Observer {
+            when(it){
+                true->{
+                    if(currentContact.isFav){
+
+                        Log.e("asd","contact bool şimdi true : ${currentContact.isFav} : $it")
+                        handleFavAnimation(true)
+                    }else{
+                        Log.e("asd","ta ananı sieyim artık")
+                        handleFavAnimation(false)
+                    }
+
+                }false->{
+
+                    if (!currentContact.isFav){
+                        Log.e("asd","orospu çocuğusun android")
+                        handleFavAnimation(false)
+
+                    }
+                }
+            }
+        })
+
+
+
+
+
+
+
     }
     private fun handleFavAnimation(isFav:Boolean){
 
@@ -144,7 +173,6 @@ class ContactDetailFragment : Fragment() {
             playTogether(scaleY,scaleX)
         }.start()
 
-
         if(isFav){
             targetObj.setColorFilter(Color.RED)
 
@@ -155,15 +183,22 @@ class ContactDetailFragment : Fragment() {
     private fun addToFavorites(){
 
         val contactArgs:ContactDetailFragmentArgs by navArgs()
-
         val currentContact = contactArgs.contact
-        localViewModel.insertContact(currentContact)
-
-        localViewModel.updateFavStatus(currentContact.id,true)
 
         Log.e("asd",currentContact.name)
-        Log.e("asd",currentContact.isFavourite.toString())
 
+        currentContact.isFav = !currentContact.isFav
+
+        Log.e("asd",currentContact.isFav.toString())
+
+        localViewModel.saveFavContactBool(true)
+
+        if (currentContact.isFav){
+            handleFavAnimation(true)
+        }else{
+            handleFavAnimation(false)
+        }
+        Log.e("asd","${localViewModel.saveFavContactBool(currentContact.isFav)}")
     }
 
     private fun handlePopUpMenuForDeleteShareContact(){
