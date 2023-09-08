@@ -7,7 +7,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.ozanarik.mvvmcontacts.business.local.ContactsDB
 import com.ozanarik.mvvmcontacts.business.repository.LocalRepository
-import com.ozanarik.mvvmcontacts.util.DatastoreManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,10 +43,5 @@ class AppModule {
     @Singleton
     fun provideLocalRoomRepo(contactsDB: ContactsDB):LocalRepository = LocalRepository(contactsDB)
 
-    @Provides
-    @Singleton
-    fun provideDataStoreManager(@ApplicationContext context:Context):DatastoreManager{
-        return DatastoreManager(context)
-    }
 
 }

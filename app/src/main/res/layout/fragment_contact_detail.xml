@@ -6,51 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.ContactDetailFragment">
 
-    <ImageView
-        android:id="@+id/imageViewUpdate"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/textViewUpdateContact"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageViewFav"
-        app:srcCompat="@drawable/baseline_miscellaneous_services_24" />
-
-    <ImageView
-        android:id="@+id/imageViewFav"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/textViewAddToFav"
-        app:layout_constraintEnd_toStartOf="@+id/imageViewUpdate"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/baseline_favorite_24" />
-
-    <TextView
-        android:id="@+id/textViewUpdateContact"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="Update Contact"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textViewAddToFav" />
-
-    <TextView
-        android:id="@+id/textViewAddToFav"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="Add To Favourites"
-        android:textAlignment="viewStart"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textViewUpdateContact"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewWhatsapp"
         android:layout_width="30dp"
@@ -174,5 +129,32 @@
             android:padding="8dp"
             app:srcCompat="@drawable/baseline_message_24" />
     </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/buttonUpdate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="18dp"
+        android:backgroundTint="@color/addContactBg"
+        android:text="Update Contact"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        app:cornerRadius="0dp"
+        app:icon="@drawable/baseline_upload_file_24"
+        app:iconTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageViewFav"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="96dp"
+        android:src="@drawable/baseline_favorite_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

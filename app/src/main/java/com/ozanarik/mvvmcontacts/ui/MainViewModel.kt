@@ -38,6 +38,9 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
     private val _deleteFromFireStoreStateFlow:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val deleteFromFireStoreStateFlow:StateFlow<Resource<Unit>> = _deleteFromFireStoreStateFlow
 
+    private val _updateState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
+    val updateState:StateFlow<Resource<Unit>> = _updateState
+
 
 
 
@@ -177,12 +180,15 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
 
                             for (c in contacts){
 
-                                val contactName = c.get("contactName")as String
-                                val contactPhoneNumber = c.get("contactPhoneNumber")as String
+                                val contactName = c.get("contactName")
+                                val contactPhoneNumber = c.get("contactPhoneNumber")
 
-                                val newContact=Contacts(0,contactName,contactPhoneNumber)
+                                if(contactName!=null && contactPhoneNumber!=null){
+                                    val newContact=Contacts(0,contactName as String,contactPhoneNumber as String)
+                                    newContactList.add(newContact)
+                                }
 
-                                newContactList.add(newContact)
+
                             }
 
                             //TO ACCESS THE FIRESTORE CONTACTS DATA ONLY ONCE AT A TIME, PREVENTING DUPLICATION AND UNNECESSARY LISTING ON RECYCLERVIEW
@@ -236,13 +242,24 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
                 _deleteFromFireStoreStateFlow.value = Resource.Error(e.localizedMessage!!)
             }
         }
-
-
-
-
-
-
-
     }
 
+    fun updateFireStoreContact(name:String,phoneNumber:String) = viewModelScope.launch {
+
+        val newContact = Contacts(0,name,phoneNumber)
+
+        val currentUser = auth.currentUser
+        val currentUserUID = currentUser?.uid
+
+        if(currentUserUID!=null){
+            val userRef = firestore.collection("Users").document(currentUserUID)
+
+            userRef.collection("Contacts").document(userRef.id).set(newContact).addOnSuccessListener {
+
+                _updateState.value = Resource.Success(Unit)
+            }.addOnFailureListener {
+                _updateState.value = Resource.Error(it.localizedMessage?:"An Unexpected Error Occured, Please try again")
+            }
+        }
+    }
 }

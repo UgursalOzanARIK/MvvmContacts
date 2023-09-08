@@ -8,7 +8,6 @@ import java.io.Serializable
 data class Contacts(
     @PrimaryKey(autoGenerate = true)
     val id:Long,
-    val name:String = "",
-    val phoneNumber:String = "",
-    var isFav:Boolean = false
+    val name: String,
+    val phoneNumber:String
 ):Serializable

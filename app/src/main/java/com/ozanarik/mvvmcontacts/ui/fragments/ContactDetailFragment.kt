@@ -1,8 +1,6 @@
 package com.ozanarik.mvvmcontacts.ui.fragments
 
 import android.Manifest
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -22,22 +20,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.FragmentContactDetailBinding
+import com.ozanarik.mvvmcontacts.databinding.FragmentUpdateContactBinding
 import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.ui.MainViewModel
 import com.ozanarik.mvvmcontacts.ui.RoomLocalViewModel
-import com.ozanarik.mvvmcontacts.util.DatastoreManager
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -53,8 +49,6 @@ class ContactDetailFragment : Fragment() {
 
     private lateinit var localViewModel: RoomLocalViewModel
     private lateinit var mainViewModel: MainViewModel
-
-    private lateinit var datastoreManager: DatastoreManager
 
     private lateinit var animJob: Job
 
@@ -76,19 +70,15 @@ class ContactDetailFragment : Fragment() {
         localViewModel = ViewModelProvider(this)[RoomLocalViewModel::class.java]
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
-
-
-        val contactArgs:ContactDetailFragmentArgs by navArgs()
-        val currentContact = contactArgs.contact
-
         animJob = Job()
 
         //FUNCTIONS***************************************************
         handleUserContactIntents()
         getIntentContactData()
         handleActivityResultLaunchers()
-        getFavContact()
         handleContactDetailImageViewButtonClicks()
+        addToFavourites()
+        updateContact()
         //FUNCTIONS***************************************************
     }
     private fun handleContactDetailImageViewButtonClicks(){
@@ -99,11 +89,6 @@ class ContactDetailFragment : Fragment() {
         binding.cardViewContact.setOnClickListener {
             pickImageForContact()
         }
-
-        binding.textViewAddToFav.setOnClickListener {
-
-            addToFavorites()
-        }
     }
     private fun getIntentContactData(){
 
@@ -111,95 +96,14 @@ class ContactDetailFragment : Fragment() {
 
         val currentContact = contactArgs.contact
 
-        contactName = currentContact.name
-        contactPhoneNumber = currentContact.phoneNumber
+        contactName = currentContact.name.toString()
+        contactPhoneNumber = currentContact.phoneNumber.toString()
 
         binding.textViewNameDetail.text = contactName
         binding.textViewPhoneNumber.text = contactPhoneNumber
     }
-    private fun getFavContact(){
-
-        val contactArgs:ContactDetailFragmentArgs by navArgs()
-        val currentContact = contactArgs.contact
 
 
-        localViewModel.getFavContactBool().observe(requireActivity(), Observer {
-            when(it){
-                true->{
-                    if(currentContact.isFav){
-
-                        Log.e("asd","contact bool şimdi true : ${currentContact.isFav} : $it")
-                        handleFavAnimation(true)
-                    }else{
-                        Log.e("asd","ta ananı sieyim artık")
-                        handleFavAnimation(false)
-                    }
-
-                }false->{
-
-                    if (!currentContact.isFav){
-                        Log.e("asd","orospu çocuğusun android")
-                        handleFavAnimation(false)
-
-                    }
-                }
-            }
-        })
-
-
-
-
-
-
-
-    }
-    private fun handleFavAnimation(isFav:Boolean){
-
-        val scaleXValue = "scaleX"
-        val scaleYValue = "scaleY"
-        val targetObj = binding.imageViewFav
-
-        val scaleX = ObjectAnimator.ofFloat(targetObj,scaleXValue,1.0f,1.5f).apply {
-            repeatCount = 1
-            repeatMode = ObjectAnimator.REVERSE
-        }
-        val scaleY = ObjectAnimator.ofFloat(targetObj,scaleYValue,1.0f,1.5f).apply {
-            repeatCount = 1
-            repeatMode = ObjectAnimator.REVERSE
-        }
-
-        val multiAnim = AnimatorSet().apply {
-            duration = 200L
-            playTogether(scaleY,scaleX)
-        }.start()
-
-        if(isFav){
-            targetObj.setColorFilter(Color.RED)
-
-        }else{
-            targetObj.setColorFilter(Color.WHITE)
-        }
-    }
-    private fun addToFavorites(){
-
-        val contactArgs:ContactDetailFragmentArgs by navArgs()
-        val currentContact = contactArgs.contact
-
-        Log.e("asd",currentContact.name)
-
-        currentContact.isFav = !currentContact.isFav
-
-        Log.e("asd",currentContact.isFav.toString())
-
-        localViewModel.saveFavContactBool(true)
-
-        if (currentContact.isFav){
-            handleFavAnimation(true)
-        }else{
-            handleFavAnimation(false)
-        }
-        Log.e("asd","${localViewModel.saveFavContactBool(currentContact.isFav)}")
-    }
 
     private fun handlePopUpMenuForDeleteShareContact(){
 
@@ -246,6 +150,37 @@ class ContactDetailFragment : Fragment() {
         }
     }
 
+    private fun addToFavourites(){
+
+        binding.imageViewFav.setOnClickListener {
+
+            val newContact = Contacts(0,contactName,contactPhoneNumber)
+
+            localViewModel.insertContact(newContact)
+            Snackbar.make(binding.imageViewFav,"$contactName added to favourites!",Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun updateContact(){
+
+        binding.buttonUpdate.setOnClickListener {
+
+            UpdateContactFragment().show((activity as AppCompatActivity).supportFragmentManager,UpdateContactFragment().tag)
+
+            val bundle = Bundle().apply {
+                val contactBundle = Contacts(0,contactName,contactPhoneNumber)
+                putSerializable("contact",contactBundle)
+            }
+
+            findNavController().navigate(R.id.action_contactDetailFragment_to_updateContactFragment)
+
+        }
+
+
+
+    }
+
+
     private fun deleteContactFromFireStore(){
         mainViewModel.deleteFireStoreContact(contactName,contactPhoneNumber)
             viewLifecycleOwner.lifecycleScope.launch {
@@ -271,12 +206,11 @@ class ContactDetailFragment : Fragment() {
     private fun shareContact(){
 
         val intent = Intent(Intent.ACTION_SEND)
-
         intent.type = "text/plain"
 
         intent.putExtra(Intent.EXTRA_TEXT,contactPhoneNumber)
 
-        val intentChooser = Intent.createChooser(intent,"Share Contact Information")
+        val intentChooser = Intent.createChooser(intent,"Share Contact")
 
         startActivity(intentChooser)
     }
@@ -370,7 +304,6 @@ class ContactDetailFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         binding.imageViewContactPhoto.setImageBitmap(null)
-        binding.textViewAddToFav.setOnClickListener (null)
         animJob.cancel()
     }
 }
