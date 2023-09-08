@@ -35,7 +35,7 @@
             android:id="@+id/action_contactDetailFragment_to_updateContactFragment"
             app:destination="@id/updateContactFragment" />
     </fragment>
-    <dialog
+    <fragment
         android:id="@+id/updateContactFragment"
         android:name="com.ozanarik.mvvmcontacts.ui.fragments.UpdateContactFragment"
         android:label="fragment_update_contact"

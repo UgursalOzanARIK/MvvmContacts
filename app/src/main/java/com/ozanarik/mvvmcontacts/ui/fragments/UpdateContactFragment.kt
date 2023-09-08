@@ -1,15 +1,11 @@
 package com.ozanarik.mvvmcontacts.ui.fragments
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
@@ -20,69 +16,75 @@ import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
 @AndroidEntryPoint
-class UpdateContactFragment : DialogFragment() {
+class UpdateContactFragment : Fragment() {
+    private lateinit var binding: FragmentUpdateContactBinding
     private lateinit var mainViewModel: MainViewModel
-    private lateinit var binding:FragmentUpdateContactBinding
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
-        dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         binding = FragmentUpdateContactBinding.inflate(inflater,container,false)
 
-        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
-
 
         binding.buttonUpdateContact.setOnClickListener {
-
-            val name = binding.editTextName.text.toString()
-            val phoneNumber = binding.editTextPhoneNumber.text.toString()
-
-            updateFireStoreContact(name,phoneNumber)
+            updateContactDataOnFireStore()
         }
+
 
         // Inflate the layout for this fragment
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        getContactDetail()
+    }
 
 
-    private fun updateFireStoreContact(name:String,phoneNumber:String){
+    private fun getContactDetail() {
 
         val contactArgs:ContactDetailFragmentArgs by navArgs()
+        val currentContact = contactArgs.contact
 
-        val contact = contactArgs.contact
-
-        var cname = binding.editTextName.text.toString()
-        var cphoneNumber = binding.editTextPhoneNumber.text.toString()
+        Log.e("asd",currentContact.name)
+        Log.e("asd",currentContact.phoneNumber)
 
 
+        binding.editTextName.setText(currentContact.name)
+        binding.editTextPhoneNumber.setText(currentContact.phoneNumber)
+
+    }
+
+    private fun updateContactDataOnFireStore(){
+
+        val contactArgs:ContactDetailFragmentArgs by navArgs()
+        val currentContact = contactArgs.contact
+
+        mainViewModel.updateFireStoreContact(currentContact.name,currentContact.phoneNumber)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            mainViewModel.updateFireStoreContact(name,phoneNumber)
-
             mainViewModel.updateState.collect{updateResult->
 
                 when(updateResult){
-
-                    is Resource.Loading->{
-                        Log.e("asd","loading")
-                    }
                     is Resource.Success->{
-                        Log.e("asd",updateResult.toString())
+                        Log.e("asd","success : ${currentContact.name} ${currentContact.phoneNumber}")
+                        binding.editTextName.setText(currentContact.name)
+                        binding.editTextPhoneNumber.setText(currentContact.phoneNumber)
 
                     }
                     is Resource.Error->{
                         Log.e("asd",updateResult.message.toString())
                     }
+                    is Resource.Loading->{
+                        Log.e("asd","loading data")
+                    }
                 }
             }
         }
     }
-
-
 }

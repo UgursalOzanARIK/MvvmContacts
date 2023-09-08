@@ -20,15 +20,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.FragmentContactDetailBinding
-import com.ozanarik.mvvmcontacts.databinding.FragmentUpdateContactBinding
 import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.ui.MainViewModel
 import com.ozanarik.mvvmcontacts.ui.RoomLocalViewModel
@@ -73,12 +73,13 @@ class ContactDetailFragment : Fragment() {
         animJob = Job()
 
         //FUNCTIONS***************************************************
+        updateContact()
+
         handleUserContactIntents()
         getIntentContactData()
         handleActivityResultLaunchers()
         handleContactDetailImageViewButtonClicks()
         addToFavourites()
-        updateContact()
         //FUNCTIONS***************************************************
     }
     private fun handleContactDetailImageViewButtonClicks(){
@@ -96,13 +97,12 @@ class ContactDetailFragment : Fragment() {
 
         val currentContact = contactArgs.contact
 
-        contactName = currentContact.name.toString()
-        contactPhoneNumber = currentContact.phoneNumber.toString()
+        contactName = currentContact.name
+        contactPhoneNumber = currentContact.phoneNumber
 
         binding.textViewNameDetail.text = contactName
         binding.textViewPhoneNumber.text = contactPhoneNumber
     }
-
 
 
     private fun handlePopUpMenuForDeleteShareContact(){
@@ -124,9 +124,11 @@ class ContactDetailFragment : Fragment() {
                 R.id.action_Share->{
                     shareContact()
                     true
-                }else->{
+                }else->
+            {
                 false
             }
+
             }
         }
         popupMenu.show()
@@ -165,18 +167,12 @@ class ContactDetailFragment : Fragment() {
 
         binding.buttonUpdate.setOnClickListener {
 
-            UpdateContactFragment().show((activity as AppCompatActivity).supportFragmentManager,UpdateContactFragment().tag)
+            val contact = Contacts(0,contactName,contactPhoneNumber)
 
-            val bundle = Bundle().apply {
-                val contactBundle = Contacts(0,contactName,contactPhoneNumber)
-                putSerializable("contact",contactBundle)
-            }
+            val bundle = bundleOf("contact" to contact)
 
-            findNavController().navigate(R.id.action_contactDetailFragment_to_updateContactFragment)
-
+            findNavController().navigate(R.id.action_contactDetailFragment_to_updateContactFragment,bundle)
         }
-
-
 
     }
 

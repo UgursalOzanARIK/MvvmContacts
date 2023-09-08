@@ -204,8 +204,6 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
                 _readFireStoreDataState.value = Resource.Error(e.localizedMessage!!)
             }
     }
-
-
     fun deleteFireStoreContact(contactName:String,contactPhoneNumber: String) = viewModelScope.launch {
 
         val currentUser = auth.currentUser
