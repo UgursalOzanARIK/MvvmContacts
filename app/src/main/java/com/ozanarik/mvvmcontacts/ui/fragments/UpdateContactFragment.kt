@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.FragmentUpdateContactBinding
 import com.ozanarik.mvvmcontacts.ui.MainViewModel
@@ -20,6 +23,7 @@ import kotlinx.coroutines.launch
 class UpdateContactFragment : Fragment() {
     private lateinit var binding: FragmentUpdateContactBinding
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,7 +31,7 @@ class UpdateContactFragment : Fragment() {
     ): View? {
 
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
-
+        firestore = Firebase.firestore
         binding = FragmentUpdateContactBinding.inflate(inflater,container,false)
 
 
@@ -60,31 +64,17 @@ class UpdateContactFragment : Fragment() {
 
     }
 
+    private fun getNewPerson(){
+
+    }
+
     private fun updateContactDataOnFireStore(){
 
         val contactArgs:ContactDetailFragmentArgs by navArgs()
         val currentContact = contactArgs.contact
 
-        mainViewModel.updateFireStoreContact(currentContact.name,currentContact.phoneNumber)
+        mainViewModel.updateContact(currentContact,)
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            mainViewModel.updateState.collect{updateResult->
 
-                when(updateResult){
-                    is Resource.Success->{
-                        Log.e("asd","success : ${currentContact.name} ${currentContact.phoneNumber}")
-                        binding.editTextName.setText(currentContact.name)
-                        binding.editTextPhoneNumber.setText(currentContact.phoneNumber)
-
-                    }
-                    is Resource.Error->{
-                        Log.e("asd",updateResult.message.toString())
-                    }
-                    is Resource.Loading->{
-                        Log.e("asd","loading data")
-                    }
-                }
-            }
-        }
     }
 }

@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.MetadataChanges
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.util.Resource
@@ -16,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import java.util.UUID
 import javax.inject.Inject
@@ -242,9 +244,7 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
         }
     }
 
-    fun updateFireStoreContact(name:String,phoneNumber:String) = viewModelScope.launch {
-
-        val newContact = Contacts(0,name,phoneNumber)
+    fun updateContact(contacts: Contacts,newContact:Map<String,Any>) = viewModelScope.launch {
 
         val currentUser = auth.currentUser
         val currentUserUID = currentUser?.uid
@@ -252,12 +252,41 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
         if(currentUserUID!=null){
             val userRef = firestore.collection("Users").document(currentUserUID)
 
-            userRef.collection("Contacts").document(userRef.id).set(newContact).addOnSuccessListener {
+            val query = userRef.collection("Contacts").whereEqualTo("contactName",contacts.name)
+                .whereEqualTo("contactPhoneNumber",contacts.phoneNumber)
+                .get()
+                .await()
+            if(query.documents!=null){
 
-                _updateState.value = Resource.Success(Unit)
-            }.addOnFailureListener {
-                _updateState.value = Resource.Error(it.localizedMessage?:"An Unexpected Error Occured, Please try again")
+                for (document in query){
+
+                    try {
+                        userRef.collection("Contacts").document(document.id).set(
+                            newContact,
+                            SetOptions.merge()
+                        ).await()
+
+                        _updateState.value = Resource.Success(Unit)
+                    }catch (e:Exception){
+                        _updateState.value = Resource.Error(e.localizedMessage!!)
+                    }
+                }
             }
         }
+    }
+
+    fun getContact(name:String,phoneNumber: String):Map<String,Any>{
+
+        val contactMap = hashMapOf<String,Any>()
+
+        if(name.isNotEmpty()){
+            contactMap["contactName"] = name
+        }
+
+        if(phoneNumber.isNotEmpty()){
+            contactMap["contactPhoneNumber"] = phoneNumber
+        }
+
+        return contactMap
     }
 }
