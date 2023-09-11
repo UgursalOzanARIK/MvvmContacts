@@ -4,12 +4,18 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,9 +51,37 @@ class ContactsFragment : Fragment() {
 
         binding = FragmentContactsBinding.inflate(inflater,container,false)
 
+
+        (activity as AppCompatActivity).setSupportActionBar(binding.myToolbar)
+
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+
+                menuInflater.inflate(R.menu.search_contact_searchview,menu)
+                val searchVievItem = menu.findItem(R.id.action_Search)
+                val searchActionView = searchVievItem.actionView as SearchView
+                searchActionView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+                    override fun onQueryTextSubmit(searchQuery: String?): Boolean {
+
+                        return false
+
+                    }
+
+                    override fun onQueryTextChange(searchQuery: String?): Boolean {
+                        searchQuery?.let { mainViewModel.searchFireStoreContact(it) }
+                        return true
+                    }
+                })
+            }
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return false
+            }
+        },viewLifecycleOwner,Lifecycle.State.RESUMED)
+
         // Inflate the layout for this fragment
         return binding.root
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

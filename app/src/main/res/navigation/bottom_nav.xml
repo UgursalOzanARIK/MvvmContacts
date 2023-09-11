@@ -12,7 +12,9 @@
         tools:layout="@layout/fragment_contacts" >
         <action
             android:id="@+id/action_action_Contacts_to_contactDetailFragment"
-            app:destination="@id/contactDetailFragment" />
+            app:destination="@id/contactDetailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/action_FavContacts"
@@ -21,7 +23,9 @@
         tools:layout="@layout/fragment_favourite_contacts" >
         <action
             android:id="@+id/action_action_FavContacts_to_contactDetailFragment"
-            app:destination="@id/contactDetailFragment" />
+            app:destination="@id/contactDetailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/contactDetailFragment"
@@ -33,11 +37,19 @@
             app:argType="com.ozanarik.mvvmcontacts.model.Contacts" />
         <action
             android:id="@+id/action_contactDetailFragment_to_updateContactFragment"
-            app:destination="@id/updateContactFragment" />
+            app:destination="@id/updateContactFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/updateContactFragment"
         android:name="com.ozanarik.mvvmcontacts.ui.fragments.UpdateContactFragment"
         android:label="fragment_update_contact"
-        tools:layout="@layout/fragment_update_contact" />
+        tools:layout="@layout/fragment_update_contact" >
+        <action
+            android:id="@+id/action_updateContactFragment_to_action_Contacts"
+            app:destination="@id/action_Contacts"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
 </navigation>

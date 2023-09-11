@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.MetadataChanges
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.util.Resource
@@ -17,7 +16,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.io.IOException
 import java.util.UUID
 import javax.inject.Inject
@@ -244,49 +242,85 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
         }
     }
 
-    fun updateContact(contacts: Contacts,newContact:Map<String,Any>) = viewModelScope.launch {
+    fun updateContact(oldContact: Contacts, newName:String, newPhoneNumber:String) = viewModelScope.launch {
 
         val currentUser = auth.currentUser
         val currentUserUID = currentUser?.uid
 
         if(currentUserUID!=null){
-            val userRef = firestore.collection("Users").document(currentUserUID)
 
-            val query = userRef.collection("Contacts").whereEqualTo("contactName",contacts.name)
-                .whereEqualTo("contactPhoneNumber",contacts.phoneNumber)
-                .get()
-                .await()
-            if(query.documents!=null){
+            try {
 
-                for (document in query){
+                val userRef = firestore.collection("Users").document(currentUserUID)
 
-                    try {
-                        userRef.collection("Contacts").document(document.id).set(
-                            newContact,
-                            SetOptions.merge()
-                        ).await()
+                val query = userRef.collection("Contacts")
+                    .whereEqualTo("contactName",oldContact.name)
+                    .whereEqualTo("contactPhoneNumber",oldContact.phoneNumber)
+                    .get()
+                    .addOnSuccessListener {querySnapshot->
 
-                        _updateState.value = Resource.Success(Unit)
-                    }catch (e:Exception){
-                        _updateState.value = Resource.Error(e.localizedMessage!!)
+                            if(querySnapshot!=null){
+
+                                for (c in querySnapshot){
+
+                                    val contactHashmap = hashMapOf<String,Any>()
+                                    contactHashmap["contactName"] = newName
+                                    contactHashmap["contactPhoneNumber"] = newPhoneNumber
+
+                                    userRef.collection("Contacts").document(c.id).update(contactHashmap).addOnSuccessListener {
+                                        Log.e("asd","success ${newName} updated")
+                                    }.addOnFailureListener {
+                                        Log.e("asd",it.localizedMessage!!)
+                                    }
+                                }
+                            }
                     }
-                }
+
+            }catch (e:Exception){
+                _updateState.value = Resource.Error(e.localizedMessage!!)
+            }catch (e:IOException){
+                _updateState.value = Resource.Error(e.localizedMessage!!)
             }
         }
     }
 
-    fun getContact(name:String,phoneNumber: String):Map<String,Any>{
+    fun searchFireStoreContact(searchQuery:String) = viewModelScope.launch {
 
-        val contactMap = hashMapOf<String,Any>()
+        val currentUser = auth.currentUser
+        val currentUserUID = currentUser?.uid
 
-        if(name.isNotEmpty()){
-            contactMap["contactName"] = name
+        if(currentUserUID!=null){
+
+            try {
+                val userRef = firestore.collection("Users").document(currentUserUID)
+
+                val userQuery = userRef.collection("Contacts").whereEqualTo("contactName",searchQuery)
+
+                userQuery.get().addOnSuccessListener {querySnapshot->
+
+
+                    val documents = querySnapshot.documents
+
+                    if(documents!=null){
+
+                        for (d in documents){
+                            Log.e("asd",d.id)
+                        }
+
+                    }else   {
+                        Log.e("asd","documents null")
+                    }
+
+
+
+                    Log.e("asd","success")
+                }.addOnFailureListener {
+                    Log.e("asd","failure")
+                }
+
+            }catch (e:Exception){
+                Log.e("asd",e.localizedMessage!!)
+            }
         }
-
-        if(phoneNumber.isNotEmpty()){
-            contactMap["contactPhoneNumber"] = phoneNumber
-        }
-
-        return contactMap
     }
 }
