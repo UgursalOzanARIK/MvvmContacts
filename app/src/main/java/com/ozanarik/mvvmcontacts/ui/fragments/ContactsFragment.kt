@@ -63,12 +63,13 @@ class ContactsFragment : Fragment() {
                 searchActionView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
                     override fun onQueryTextSubmit(searchQuery: String?): Boolean {
 
+                        searchQuery?.let { searchFirestoreContact(it) }
                         return false
 
                     }
 
                     override fun onQueryTextChange(searchQuery: String?): Boolean {
-                        searchQuery?.let { mainViewModel.searchFireStoreContact(it) }
+                        searchQuery?.let {  }
                         return true
                     }
                 })
@@ -80,6 +81,29 @@ class ContactsFragment : Fragment() {
 
         // Inflate the layout for this fragment
         return binding.root
+    }
+
+
+    private fun searchFirestoreContact(searchQuery:String){
+        mainViewModel.searchFireStoreContact(searchQuery)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            mainViewModel.updateState.collect{updateState->
+
+                when(updateState){
+
+                    is Resource.Success->{
+                        Log.e("asd",updateState.message.toString())
+                    }
+                    is Resource.Loading->{
+                        Log.e("asd","loading")
+                    }
+                    is Resource.Error->{
+                        Log.e("asd",updateState.message.toString())
+                    }
+                }
+            }
+        }
     }
 
 

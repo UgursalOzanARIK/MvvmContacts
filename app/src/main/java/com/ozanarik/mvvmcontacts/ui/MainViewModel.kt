@@ -298,29 +298,19 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
 
                 userQuery.get().addOnSuccessListener {querySnapshot->
 
-
-                    val documents = querySnapshot.documents
-
-                    if(documents!=null){
-
-                        for (d in documents){
-                            Log.e("asd",d.id)
-                        }
-
-                    }else   {
-                        Log.e("asd","documents null")
-                    }
-
-
-
-                    Log.e("asd","success")
+                    Log.e("asd",querySnapshot.documents.toString())
+                    Log.e("asd",querySnapshot.query.toString())
+                    Log.e("asd",querySnapshot.isEmpty.toString())
+                    _updateState.value = Resource.Success(Unit)
                 }.addOnFailureListener {
-                    Log.e("asd","failure")
+                    _updateState.value = Resource.Error(it.localizedMessage!!)
                 }
 
-            }catch (e:Exception){
-                Log.e("asd",e.localizedMessage!!)
-            }
+                }catch (e:Exception){
+                    _updateState.value = Resource.Error(e.localizedMessage!!)
+                    Log.e("asd",e.localizedMessage!!)
+                }
         }
-    }
+}
+
 }
