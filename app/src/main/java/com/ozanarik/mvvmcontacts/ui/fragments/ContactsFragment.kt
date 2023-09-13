@@ -85,25 +85,9 @@ class ContactsFragment : Fragment() {
 
 
     private fun searchFirestoreContact(searchQuery:String){
-        mainViewModel.searchFireStoreContact(searchQuery)
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            mainViewModel.updateState.collect{updateState->
+            mainViewModel.searchFireStoreContact(searchQuery)
 
-                when(updateState){
-
-                    is Resource.Success->{
-                        Log.e("asd",updateState.message.toString())
-                    }
-                    is Resource.Loading->{
-                        Log.e("asd","loading")
-                    }
-                    is Resource.Error->{
-                        Log.e("asd",updateState.message.toString())
-                    }
-                }
-            }
-        }
     }
 
 
@@ -145,6 +129,7 @@ class ContactsFragment : Fragment() {
             }
         }
     }
+
 
     private fun handleRecyclerView(){
         contactsAdapter = ContactsAdapter(object : AdapterItemClickListener {

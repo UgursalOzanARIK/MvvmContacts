@@ -291,25 +291,44 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
 
         if(currentUserUID!=null){
 
+            Log.e("asd",currentUserUID.toString())
+
             try {
+
                 val userRef = firestore.collection("Users").document(currentUserUID)
 
-                val userQuery = userRef.collection("Contacts").whereEqualTo("contactName",searchQuery)
+                val query = userRef.collection("Contacts").whereEqualTo("contactName",searchQuery)
+                    .get()
+                    .addOnSuccessListener { querySnapshot->
 
-                userQuery.get().addOnSuccessListener {querySnapshot->
 
-                    Log.e("asd",querySnapshot.documents.toString())
-                    Log.e("asd",querySnapshot.query.toString())
-                    Log.e("asd",querySnapshot.isEmpty.toString())
-                    _updateState.value = Resource.Success(Unit)
-                }.addOnFailureListener {
-                    _updateState.value = Resource.Error(it.localizedMessage!!)
-                }
+                        val searchResult = mutableListOf<Contacts>()
 
-                }catch (e:Exception){
-                    _updateState.value = Resource.Error(e.localizedMessage!!)
-                    Log.e("asd",e.localizedMessage!!)
-                }
+                        for (data in querySnapshot){
+                            Log.e("asd",data.id)
+                            Log.e("asd",data.data.toString())
+
+                            val contact = data.toObject(Contacts::class.java)
+
+                            searchResult.add(contact)
+                            Log.e("asd",contact.name)
+
+                        }
+
+
+
+                    }.addOnFailureListener{
+                        Log.e("as",it.localizedMessage!!)
+                    }
+
+
+            }catch (e:Exception){
+
+                _updateState.value = Resource.Error(e.localizedMessage!!)
+
+            }
+
+
         }
 }
 

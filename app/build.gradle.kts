@@ -68,10 +68,10 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx")
 
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    kapt("androidx.lifecycle:lifecycle-common:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    kapt("androidx.lifecycle:lifecycle-common:2.6.2")
 
     implementation("com.google.firebase:firebase-storage-ktx")
 
@@ -84,9 +84,9 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.1")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.1")
-    implementation("androidx.navigation:navigation-common:2.7.1")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.2")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.2")
+    implementation("androidx.navigation:navigation-common:2.7.2")
 
 
 

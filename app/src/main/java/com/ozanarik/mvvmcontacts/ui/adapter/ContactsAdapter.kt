@@ -10,6 +10,7 @@ import com.ozanarik.mvvmcontacts.databinding.ItemContactListBinding
 import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.util.AdapterItemClickListener
 
+
 class ContactsAdapter(private val clickListener: AdapterItemClickListener): RecyclerView.Adapter<ContactsAdapter.ContactsHolder>(){
 
     inner class ContactsHolder(val binding:ItemContactListBinding):RecyclerView.ViewHolder(binding.root)
@@ -53,6 +54,7 @@ class ContactsAdapter(private val clickListener: AdapterItemClickListener): Recy
         }
 
     }
+
     override fun getItemCount(): Int {
         return differList.currentList.size
     }
