@@ -38,10 +38,11 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
     private val _deleteFromFireStoreStateFlow:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val deleteFromFireStoreStateFlow:StateFlow<Resource<Unit>> = _deleteFromFireStoreStateFlow
 
-    private val _updateState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
-    val updateState:StateFlow<Resource<Unit>> = _updateState
+    private val _searchState:MutableStateFlow<Resource<List<Contacts>>> = MutableStateFlow(Resource.Loading())
+    val searchState:StateFlow<Resource<List<Contacts>>> = _searchState
 
-
+    private val _updateState:MutableStateFlow<Resource<List<Contacts>>> = MutableStateFlow(Resource.Loading())
+    val updateState:StateFlow<Resource<List<Contacts>>> = _updateState
 
 
     fun signUp(email:String,password:String)=viewModelScope.launch{
@@ -268,9 +269,9 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
                                     contactHashmap["contactPhoneNumber"] = newPhoneNumber
 
                                     userRef.collection("Contacts").document(c.id).update(contactHashmap).addOnSuccessListener {
-                                        Log.e("asd","success ${newName} updated")
+                                        Log.e("success","success ${newName} updated")
                                     }.addOnFailureListener {
-                                        Log.e("asd",it.localizedMessage!!)
+                                        Log.e("failure",it.localizedMessage!!)
                                     }
                                 }
                             }
@@ -284,51 +285,29 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
         }
     }
 
-    fun searchFireStoreContact(searchQuery:String) = viewModelScope.launch {
+    fun searchFireStoreContact(searchQuery:String,contactList:MutableList<Contacts>) = viewModelScope.launch {
 
         val currentUser = auth.currentUser
         val currentUserUID = currentUser?.uid
 
+
         if(currentUserUID!=null){
 
-            Log.e("asd",currentUserUID.toString())
 
-            try {
+            val userRef = firestore.collection("Users").document(currentUserUID)
 
-                val userRef = firestore.collection("Users").document(currentUserUID)
+            userRef.collection("Contacts").get()
+                .addOnSuccessListener { document->
 
-                val query = userRef.collection("Contacts").whereEqualTo("contactName",searchQuery)
-                    .get()
-                    .addOnSuccessListener { querySnapshot->
-
-
-                        val searchResult = mutableListOf<Contacts>()
-
-                        for (data in querySnapshot){
-                            Log.e("asd",data.id)
-                            Log.e("asd",data.data.toString())
-
-                            val contact = data.toObject(Contacts::class.java)
-
-                            searchResult.add(contact)
-                            Log.e("asd",contact.name)
-
-                        }
-
-
-
-                    }.addOnFailureListener{
-                        Log.e("as",it.localizedMessage!!)
+                    if (document!=null){
+                        Log.d("asd",document.metadata.toString())
+                    }else{
+                        Log.d("sad","no document")
                     }
 
-
-            }catch (e:Exception){
-
-                _updateState.value = Resource.Error(e.localizedMessage!!)
-
-            }
-
-
+                }.addOnFailureListener {
+                    Log.d("get failed","get fdailed")
+                }
         }
 }
 

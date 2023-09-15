@@ -83,13 +83,27 @@ class ContactsFragment : Fragment() {
         return binding.root
     }
 
-
     private fun searchFirestoreContact(searchQuery:String){
 
-            mainViewModel.searchFireStoreContact(searchQuery)
+        mainViewModel.searchFireStoreContact(searchQuery,contactsAdapter.differList.currentList)
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            mainViewModel.searchState.collect{ contactList->
+
+                when(contactList){
+                    is Resource.Error->{
+                        Toast.makeText(requireContext(),contactList.message,Toast.LENGTH_LONG).show()
+                    }
+                    is Resource.Success->{
+                        contactList.let { contactsAdapter.differList.submitList(it.data!!)}
+                    }
+                    is Resource.Loading->{
+                        Toast.makeText(requireContext(),"Getting contact data",Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
