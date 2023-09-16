@@ -285,29 +285,57 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
         }
     }
 
-    fun searchFireStoreContact(searchQuery:String,contactList:MutableList<Contacts>) = viewModelScope.launch {
+    fun searchFireStoreContact(searchQuery:String) = viewModelScope.launch {
 
         val currentUser = auth.currentUser
         val currentUserUID = currentUser?.uid
 
-
+        val contactList = mutableListOf<Contacts>()
         if(currentUserUID!=null){
 
+           try {
 
-            val userRef = firestore.collection("Users").document(currentUserUID)
+               val userRef = firestore.collection("Users").document(currentUserUID)
 
-            userRef.collection("Contacts").get()
-                .addOnSuccessListener { document->
+               userRef.collection("Contacts").addSnapshotListener { value, error ->
 
-                    if (document!=null){
-                        Log.d("asd",document.metadata.toString())
-                    }else{
-                        Log.d("sad","no document")
-                    }
+                   if(error!=null){
+                       _searchState.value = Resource.Error(error.localizedMessage!!)
+                       Log.e("asd","error from snapshotListener")
+                   }else if(value!=null){
 
-                }.addOnFailureListener {
-                    Log.d("get failed","get fdailed")
-                }
+                       val documents = value.documents
+
+                       for (everyContact in documents){
+
+
+                           val contactName = everyContact.get("contactName")
+                           val contactPhoneNumber = everyContact.get("contactPhoneNumber")
+
+
+                           if(contactName!=null && contactPhoneNumber!=null){
+                               val newContact = Contacts(0,contactName as String,contactPhoneNumber as String)
+                               contactList.add(newContact)
+
+                               val filteredList = contactList.filter { query->
+                                   query.toString().lowercase().contains(searchQuery)
+                               }
+
+                               Log.e("asd",filteredList.size.toString())
+
+                               _searchState.value = Resource.Success(filteredList)
+
+                               for (c in filteredList){
+                                   Log.e("asd",c.name)
+                               }
+                           }
+                       }
+                   }
+               }
+
+           }catch (e:Exception){
+               _searchState.value = Resource.Error(e.localizedMessage!!)
+           }
         }
 }
 

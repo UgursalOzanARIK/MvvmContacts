@@ -34,7 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ContactsFragment : Fragment() {
+class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
 
     private lateinit var firestore: FirebaseFirestore
     private lateinit var binding: FragmentContactsBinding
@@ -51,28 +51,17 @@ class ContactsFragment : Fragment() {
 
         binding = FragmentContactsBinding.inflate(inflater,container,false)
 
-
         (activity as AppCompatActivity).setSupportActionBar(binding.myToolbar)
 
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
 
-                menuInflater.inflate(R.menu.search_contact_searchview,menu)
+                menuInflater.inflate(R.menu.search_contact,menu)
                 val searchVievItem = menu.findItem(R.id.action_Search)
                 val searchActionView = searchVievItem.actionView as SearchView
-                searchActionView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
-                    override fun onQueryTextSubmit(searchQuery: String?): Boolean {
+                searchActionView.setOnQueryTextListener(this@ContactsFragment)
 
-                        searchQuery?.let { searchFirestoreContact(it) }
-                        return false
 
-                    }
-
-                    override fun onQueryTextChange(searchQuery: String?): Boolean {
-                        searchQuery?.let {  }
-                        return true
-                    }
-                })
             }
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return false
@@ -85,7 +74,7 @@ class ContactsFragment : Fragment() {
 
     private fun searchFirestoreContact(searchQuery:String){
 
-        mainViewModel.searchFireStoreContact(searchQuery,contactsAdapter.differList.currentList)
+        mainViewModel.searchFireStoreContact(searchQuery)
 
         viewLifecycleOwner.lifecycleScope.launch {
             mainViewModel.searchState.collect{ contactList->
@@ -169,5 +158,15 @@ class ContactsFragment : Fragment() {
         readFireStoreContacts()
         handleRecyclerView()
         super.onResume()
+    }
+
+    override fun onQueryTextSubmit(searchQuery: String?): Boolean {
+
+        return false
+    }
+
+    override fun onQueryTextChange(searchQuery: String?): Boolean {
+        searchQuery?.let { searchFirestoreContact(it) }
+        return true
     }
 }

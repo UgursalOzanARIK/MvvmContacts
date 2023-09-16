@@ -88,6 +88,8 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.2")
     implementation("androidx.navigation:navigation-common:2.7.2")
 
+    implementation("androidx.appcompat:appcompat:1.6.1")
+
 
 
 }

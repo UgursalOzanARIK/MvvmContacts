@@ -186,6 +186,7 @@ class ContactDetailFragment : Fragment() {
                     is Resource.Success->{
                         Snackbar.make(binding.imgViewMore,"$contactName deleted from database!",
                             Snackbar.LENGTH_LONG).show()
+
                     }
                     is Resource.Loading->{
                         Snackbar.make(binding.imgViewMore,"Deleting $contactName, please wait...",
