@@ -1,6 +1,7 @@
 package com.ozanarik.mvvmcontacts.ui.fragments
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -54,6 +55,9 @@ class ContactDetailFragment : Fragment() {
 
     private var selectedImg: Uri?=null
 
+
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -77,8 +81,8 @@ class ContactDetailFragment : Fragment() {
 
         handleUserContactIntents()
         getIntentContactData()
-        handleActivityResultLaunchers()
         handleContactDetailImageViewButtonClicks()
+        handleActivityResultLaunchers()
         addToFavourites()
         //FUNCTIONS***************************************************
     }
@@ -91,6 +95,9 @@ class ContactDetailFragment : Fragment() {
             pickImageForContact()
         }
     }
+
+
+
     private fun getIntentContactData(){
 
         val contactArgs:ContactDetailFragmentArgs by navArgs()
@@ -173,7 +180,6 @@ class ContactDetailFragment : Fragment() {
 
             findNavController().navigate(R.id.action_contactDetailFragment_to_updateContactFragment,bundle)
         }
-
     }
 
 
@@ -196,7 +202,6 @@ class ContactDetailFragment : Fragment() {
                         Snackbar.make(binding.imgViewMore,hasDeleted.message!!, Snackbar.LENGTH_LONG).show()
                     }
                 }
-                delay(2000L)
             }
         }
     }
@@ -242,6 +247,9 @@ class ContactDetailFragment : Fragment() {
                 if(intentData!=null){
                     selectedImg = intentData.data
                     selectedImg?.let { binding.imageViewContactPhoto.setImageURI(it) }
+
+                    selectedImg?.let { mainViewModel.uploadPhotoToFirebaseStorage(it) }
+
                 }
             }
         }

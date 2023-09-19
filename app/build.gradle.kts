@@ -90,6 +90,9 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.6.1")
 
+   implementation("androidx.preference:preference-ktx:1.2.1")
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+
 
 
 }

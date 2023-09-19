@@ -16,6 +16,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -72,6 +73,7 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
         return binding.root
     }
 
+
     private fun searchFirestoreContact(searchQuery:String){
 
         mainViewModel.searchFireStoreContact(searchQuery)
@@ -100,6 +102,9 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
         firestore = Firebase.firestore
         auth = Firebase.auth
         readFireStoreContacts()
+
+
+
 
         binding.floatingActionButton.setOnClickListener {
 

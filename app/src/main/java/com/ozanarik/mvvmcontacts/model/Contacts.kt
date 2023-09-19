@@ -1,5 +1,6 @@
 package com.ozanarik.mvvmcontacts.model
 
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
@@ -9,5 +10,5 @@ data class Contacts(
     @PrimaryKey(autoGenerate = true)
     val id:Long,
     val name: String = "",
-    val phoneNumber:String = ""
+    val phoneNumber:String = "",
 ):Serializable

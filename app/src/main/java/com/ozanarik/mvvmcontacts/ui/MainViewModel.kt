@@ -2,6 +2,8 @@ package com.ozanarik.mvvmcontacts.ui
 
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
@@ -28,6 +30,8 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
 
     private val _uploadPhotoState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val uploadPhotoState:StateFlow<Resource<Unit>> = _uploadPhotoState
+
+
 
     private val _uploadContactToFireStoreState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val uploadContactToFireStoreState:StateFlow<Resource<Unit>> = _uploadContactToFireStoreState
@@ -67,22 +71,20 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
 
         imgRef.putFile(selectedImg).addOnSuccessListener {
 
+            val contactMap = hashMapOf<String,Any>()
 
             imgRef.downloadUrl.addOnSuccessListener {
 
-                val downloadUrl = it.toString()
 
                 val currentUser = auth.currentUser
                 val currentUserUID = currentUser?.uid
 
                 Log.e("asd","sssss")
 
-       /*         if(currentUserUID!=null){
+                if(currentUserUID!=null){
 
-                    val contactMap = hashMapOf<String,Any>()
 
-                    contactMap["downloadUrl"] = downloadUrl
-                    contactMap["timeStamp"] = Timestamp.now()
+                    contactMap["pic"] = selectedImg
 
 
                     val collection = firestore.collection("Users").document(currentUserUID)
@@ -92,7 +94,7 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
                     }.addOnFailureListener {e->
                         Log.e("asd",e.localizedMessage!!)
                     }
-                }*/
+                }
             }
 
 
@@ -102,6 +104,31 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
         }
 
         return Resource.Loading()
+    }
+
+
+    fun getContactPhoto(){
+
+        val currentUser = auth.currentUser
+        val currentUserUID  = currentUser?.uid
+
+        if(currentUserUID!=null){
+
+            val userRef = firestore.collection("Users").document(currentUserUID)
+
+            userRef.collection("Contacts").get().addOnSuccessListener {contacts->
+
+                for (contact in contacts){
+
+                    val photoList = mutableListOf<String>()
+
+                }
+            }
+
+        }
+
+
+
     }
 
     private fun signUpUser(email:String, password:String):Resource<Unit> {
@@ -124,40 +151,37 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
         return Resource.Success(Unit)
     }
 
-fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Resource<Unit>{
+fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String){
+
     try {
-        val currentUserUID = auth.currentUser?.uid
 
-        if(currentUserUID!=null){
+        val currentUser= auth.currentUser
+        val currentUserUid = currentUser?.uid
 
-            val userRef = firestore.collection("Users").document(currentUserUID)
-            val contactMap = hashMapOf<String,Any>()
+        val contactHashmap = hashMapOf<String,Any>()
+        val timeUploaded = Timestamp.now()
 
+        if (currentUserUid!=null){
 
-            val timeUploaded = Timestamp.now()
+            contactHashmap["contactName"] = contactName
+            contactHashmap["contactPhoneNumber"] = contactPhoneNumber
+            contactHashmap["timeUploaded"] = timeUploaded
+            contactHashmap["currentUserEmail"] = currentUser.email!!
 
-            contactMap["contactName"] = contactName
-            contactMap["contactPhoneNumber"] = contactPhoneNumber
-            contactMap["timeUploaded"] = timeUploaded
-            contactMap["currentUserEmail"] = auth.currentUser!!.email!!
+            val userRef = firestore.collection("Users").document(currentUserUid)
 
-            userRef.collection("Contacts").add(contactMap).addOnSuccessListener {
+            userRef.collection("Contacts").add(contactHashmap).addOnSuccessListener { success->
 
-                Log.e("asd","successfully created")
                 _uploadContactToFireStoreState.value = Resource.Success(Unit)
+                getContactPhoto()
 
-            }.addOnFailureListener {
-                Log.e("asd", it.localizedMessage!!)
-                _uploadContactToFireStoreState.value = Resource.Error(it.localizedMessage!!)
+            }.addOnFailureListener {error->
+                _uploadContactToFireStoreState.value = Resource.Error(error.localizedMessage!!)
             }
         }
-
-    }catch (e:Exception) {
-
-        return Resource.Error(e.localizedMessage!!)
-
+    }catch (e:Exception){
+        _uploadContactToFireStoreState.value = Resource.Error(e.localizedMessage!!)
     }
-    return Resource.Loading()
     }
 
     fun readFireStoreContactData()=viewModelScope.launch {
@@ -269,7 +293,7 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String):Reso
                                     contactHashmap["contactPhoneNumber"] = newPhoneNumber
 
                                     userRef.collection("Contacts").document(c.id).update(contactHashmap).addOnSuccessListener {
-                                        Log.e("success","success ${newName} updated")
+                                        Log.e("success","success! /// ${newName} updated")
                                     }.addOnFailureListener {
                                         Log.e("failure",it.localizedMessage!!)
                                     }
