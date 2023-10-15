@@ -38,6 +38,10 @@ class AddContactDialogFragment : DialogFragment(){
 
         }
 
+        binding.imageViewCloseDialog.setOnClickListener {
+            dismiss()
+        }
+
         return binding.root
     }
 

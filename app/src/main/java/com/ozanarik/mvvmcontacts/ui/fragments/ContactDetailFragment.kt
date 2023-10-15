@@ -45,17 +45,10 @@ class ContactDetailFragment : Fragment() {
     private lateinit var contactName:String
     private lateinit var contactPhoneNumber:String
 
-    private lateinit var permissionLauncher: ActivityResultLauncher<String>
-    private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
-
     private lateinit var localViewModel: RoomLocalViewModel
     private lateinit var mainViewModel: MainViewModel
 
     private lateinit var animJob: Job
-
-    private var selectedImg: Uri?=null
-
-
 
 
     override fun onCreateView(
@@ -82,7 +75,6 @@ class ContactDetailFragment : Fragment() {
         handleUserContactIntents()
         getIntentContactData()
         handleContactDetailImageViewButtonClicks()
-        handleActivityResultLaunchers()
         addToFavourites()
         //FUNCTIONS***************************************************
     }
@@ -91,12 +83,7 @@ class ContactDetailFragment : Fragment() {
             handlePopUpMenuForDeleteShareContact()
         }
 
-        binding.cardViewContact.setOnClickListener {
-            pickImageForContact()
-        }
     }
-
-
 
     private fun getIntentContactData(){
 
@@ -192,6 +179,7 @@ class ContactDetailFragment : Fragment() {
                     is Resource.Success->{
                         Snackbar.make(binding.imgViewMore,"$contactName deleted from database!",
                             Snackbar.LENGTH_LONG).show()
+                       findNavController().navigate(R.id.action_contactDetailFragment_to_action_Contacts)
 
                     }
                     is Resource.Loading->{
@@ -217,54 +205,6 @@ class ContactDetailFragment : Fragment() {
         startActivity(intentChooser)
     }
 
-    private fun pickImageForContact(){
-
-        if (ContextCompat.checkSelfPermission(requireContext(),
-                Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
-                    Manifest.permission.READ_EXTERNAL_STORAGE)){
-                Snackbar.make(binding.cardViewContact,"Permission needed to pick an image for your contact",Snackbar.LENGTH_INDEFINITE).apply {
-                    setAction("Grant Permission"){
-                        permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    }
-                }.show()
-            }else{
-                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
-        }else{
-            imagePickerLauncher.launch(Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI))
-
-        }
-    }
-    private fun handleActivityResultLaunchers(){
-        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ activityResult->
-
-            if(activityResult.resultCode == AppCompatActivity.RESULT_OK){
-
-                val intentData = activityResult.data
-
-                if(intentData!=null){
-                    selectedImg = intentData.data
-                    selectedImg?.let { binding.imageViewContactPhoto.setImageURI(it) }
-
-                    selectedImg?.let { mainViewModel.uploadPhotoToFirebaseStorage(it) }
-
-                }
-            }
-        }
-        permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ isGranted->
-
-            when(isGranted){
-                true->{
-                    imagePickerLauncher.launch(Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI))
-                }
-                false->{
-                    Snackbar.make(binding.cardViewContact,"Please grant permission to be able to pick a photo for your contact",Snackbar.LENGTH_LONG).show()
-                }
-            }
-        }
-    }
     private fun handleUserContactIntents(){
 
         binding.cardViewWhatsapp.setOnClickListener {

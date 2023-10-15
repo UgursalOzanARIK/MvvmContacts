@@ -77,17 +77,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextPassword" />
 
-    <TextView
-        android:id="@+id/textViewNoSignUp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="4dp"
-        android:text="Don't want to sign-up/in ? Continue here"
-        android:textAlignment="center"
-        android:textColor="@color/design_default_color_error"
-        android:textSize="8sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonSignIn" />
 </androidx.constraintlayout.widget.ConstraintLayout>

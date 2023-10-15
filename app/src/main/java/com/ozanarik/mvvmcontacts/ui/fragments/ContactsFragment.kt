@@ -1,5 +1,6 @@
 package com.ozanarik.mvvmcontacts.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +22,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -27,6 +30,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.FragmentContactsBinding
+import com.ozanarik.mvvmcontacts.ui.LoginSignUpActivity
 import com.ozanarik.mvvmcontacts.ui.MainViewModel
 import com.ozanarik.mvvmcontacts.ui.adapter.ContactsAdapter
 import com.ozanarik.mvvmcontacts.util.AdapterItemClickListener
@@ -61,16 +65,47 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
                 val searchVievItem = menu.findItem(R.id.action_Search)
                 val searchActionView = searchVievItem.actionView as SearchView
                 searchActionView.setOnQueryTextListener(this@ContactsFragment)
-
-
             }
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return false
             }
         },viewLifecycleOwner,Lifecycle.State.RESUMED)
 
+
+        binding.imageView.setOnClickListener {
+            signOutUser()
+        }
+
+
+
         // Inflate the layout for this fragment
         return binding.root
+    }
+
+
+    private fun signOutUser(){
+
+
+        mainViewModel.signOutUser()
+        viewLifecycleOwner.lifecycleScope.launch {
+            mainViewModel.signOutState.collect{signOutResult->
+
+                when(signOutResult){
+
+                    is Resource.Success->{
+                        findNavController().navigate(R.id.action_action_Contacts_to_loginSignUpActivity)
+                    }
+                    is Resource.Error->{
+                        Toast.makeText(requireContext(),signOutResult.message,Toast.LENGTH_LONG).show()
+                    }
+                    is Resource.Loading->{
+                        Toast.makeText(requireContext(),signOutResult.message,Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+
+
     }
 
 
@@ -102,9 +137,6 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
         firestore = Firebase.firestore
         auth = Firebase.auth
         readFireStoreContacts()
-
-
-
 
         binding.floatingActionButton.setOnClickListener {
 

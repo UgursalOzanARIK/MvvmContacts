@@ -39,7 +39,45 @@ class LoginSignUpActivity : AppCompatActivity() {
 
             signUp(email,password)
             }
+
+        binding.buttonSignIn.setOnClickListener {
+
+            signIn()
         }
+
+
+        }
+
+
+    private fun signIn(){
+
+        val email = binding.editTextEmail.text.toString()
+        val password = binding.editTextPassword.text.toString()
+
+            if(email.isNotEmpty() && password.isNotEmpty()){
+                mainViewModel.signIn(email,password)
+
+                lifecycleScope.launch {
+                    mainViewModel.signInState.collect{signInState->
+                        when(signInState){
+                            is Resource.Success->{
+                                startActivity(Intent(this@LoginSignUpActivity,MainActivity::class.java))
+                                finish()
+                            }
+                            is Resource.Error->{
+                                Snackbar.make(binding.buttonSignIn,signInState.message!!,Snackbar.LENGTH_LONG).show()
+                            }
+                            is Resource.Loading->{
+                                Snackbar.make(binding.buttonSignIn,"Loading",Snackbar.LENGTH_LONG).show()
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+    }
 
     private fun signUp(email:String, password:String){
 
@@ -51,8 +89,7 @@ class LoginSignUpActivity : AppCompatActivity() {
 
                 when(result){
                     is Resource.Success->{
-                        //RECYCLERVIEW TO BE UPDATED
-                        Snackbar.make(binding.buttonSignUp,"helal lan",Snackbar.LENGTH_LONG).show()
+                        Snackbar.make(binding.buttonSignUp,"Signed up successfully!",Snackbar.LENGTH_LONG).show()
                         startActivity(Intent(this@LoginSignUpActivity,MainActivity::class.java))
                         finish()
                     }

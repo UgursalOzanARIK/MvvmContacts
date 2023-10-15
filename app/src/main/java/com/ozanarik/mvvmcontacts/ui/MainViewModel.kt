@@ -48,6 +48,12 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
     private val _updateState:MutableStateFlow<Resource<List<Contacts>>> = MutableStateFlow(Resource.Loading())
     val updateState:StateFlow<Resource<List<Contacts>>> = _updateState
 
+    private val _signOutState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
+    val signOutState:StateFlow<Resource<Unit>> = _signOutState
+
+    private val _signInState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
+    val signInState:StateFlow<Resource<Unit>> = _signInState
+
 
     fun signUp(email:String,password:String)=viewModelScope.launch{
 
@@ -59,74 +65,28 @@ class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStor
         }
     }
 
-    fun uploadPhotoToFirebaseStorage(selectedImg:Uri):Resource<Unit> {
+    fun signOutUser()=viewModelScope.launch {
 
+        val currentUser=auth.currentUser
 
-        val userRef = firebaseStorage.reference
-        val randomUID = UUID.randomUUID()
-
-        val imageName = "${auth.currentUser!!.email} $randomUID.png"
-
-        val imgRef = userRef.child("images/").child(imageName)
-
-        imgRef.putFile(selectedImg).addOnSuccessListener {
-
-            val contactMap = hashMapOf<String,Any>()
-
-            imgRef.downloadUrl.addOnSuccessListener {
-
-
-                val currentUser = auth.currentUser
-                val currentUserUID = currentUser?.uid
-
-                Log.e("asd","sssss")
-
-                if(currentUserUID!=null){
-
-
-                    contactMap["pic"] = selectedImg
-
-
-                    val collection = firestore.collection("Users").document(currentUserUID)
-
-                    collection.collection("Contacts").add(contactMap).addOnSuccessListener {
-                       Log.e("asd","helal")
-                    }.addOnFailureListener {e->
-                        Log.e("asd",e.localizedMessage!!)
-                    }
-                }
-            }
-
-
-            _uploadPhotoState.value = Resource.Success(Unit)
-        }.addOnFailureListener{
-            _uploadPhotoState.value = Resource.Error(it.localizedMessage!!)
+        if(currentUser!=null){
+            auth.signOut()
+            _signOutState.value = Resource.Success(Unit)
+        }else {
+            _signOutState.value=Resource.Error("Error Occured")
         }
-
-        return Resource.Loading()
     }
 
 
-    fun getContactPhoto(){
+    fun signIn(email:String,password: String){
 
-        val currentUser = auth.currentUser
-        val currentUserUID  = currentUser?.uid
+        auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {signInResult->
 
-        if(currentUserUID!=null){
-
-            val userRef = firestore.collection("Users").document(currentUserUID)
-
-            userRef.collection("Contacts").get().addOnSuccessListener {contacts->
-
-                for (contact in contacts){
-
-                    val photoList = mutableListOf<String>()
-
-                }
-            }
+            _signInState.value = Resource.Success(Unit)
+        }.addOnFailureListener { signInResult->
+            _signInState.value = Resource.Error(signInResult.localizedMessage!!)
 
         }
-
 
 
     }
@@ -173,7 +133,6 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String){
             userRef.collection("Contacts").add(contactHashmap).addOnSuccessListener { success->
 
                 _uploadContactToFireStoreState.value = Resource.Success(Unit)
-                getContactPhoto()
 
             }.addOnFailureListener {error->
                 _uploadContactToFireStoreState.value = Resource.Error(error.localizedMessage!!)
@@ -286,13 +245,13 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String){
 
                             if(querySnapshot!=null){
 
-                                for (c in querySnapshot){
+                                for (contact in querySnapshot){
 
                                     val contactHashmap = hashMapOf<String,Any>()
                                     contactHashmap["contactName"] = newName
                                     contactHashmap["contactPhoneNumber"] = newPhoneNumber
 
-                                    userRef.collection("Contacts").document(c.id).update(contactHashmap).addOnSuccessListener {
+                                    userRef.collection("Contacts").document(contact.id).update(contactHashmap).addOnSuccessListener {
                                         Log.e("success","success! /// ${newName} updated")
                                     }.addOnFailureListener {
                                         Log.e("failure",it.localizedMessage!!)

@@ -15,6 +15,9 @@
             app:destination="@id/contactDetailFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
+        <action
+            android:id="@+id/action_action_Contacts_to_loginSignUpActivity"
+            app:destination="@id/loginSignUpActivity" />
     </fragment>
     <fragment
         android:id="@+id/action_FavContacts"
@@ -40,6 +43,9 @@
             app:destination="@id/updateContactFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
+        <action
+            android:id="@+id/action_contactDetailFragment_to_action_Contacts"
+            app:destination="@id/action_Contacts" />
     </fragment>
     <fragment
         android:id="@+id/updateContactFragment"
@@ -52,4 +58,9 @@
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
+    <activity
+        android:id="@+id/loginSignUpActivity"
+        android:name="com.ozanarik.mvvmcontacts.ui.LoginSignUpActivity"
+        android:label="activity_login_sign_up"
+        tools:layout="@layout/activity_login_sign_up" />
 </navigation>
