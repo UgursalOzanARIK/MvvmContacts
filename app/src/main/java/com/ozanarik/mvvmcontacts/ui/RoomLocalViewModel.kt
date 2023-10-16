@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,24 +33,22 @@ class RoomLocalViewModel @Inject constructor
         localRepository.getAllContacts().collect{contactList->
 
             when(contactList){
-
                 is Resource.Success->{
                     _localContactsData.value = Resource.Success(contactList.data!!)
                 }
-                is Resource.Loading->{
-                    _localContactsData.value = Resource.Loading()
-                }
                 is Resource.Error->{
                     _localContactsData.value = Resource.Error(contactList.message!!)
+                }
+                is Resource.Loading->{
+                    _localContactsData.value = Resource.Loading()
                 }
             }
         }
     }
 
-    fun insertContact(contacts: Contacts) = viewModelScope.launch {
+    fun insertContact(contacts: Contacts) = viewModelScope.launch { localRepository.insertContact(contacts) }
 
-        localRepository.insertContact(contacts)
-    }
+    fun deleteContact(contacts: Contacts) = viewModelScope.launch { localRepository.deleteFromContacts(contacts) }
 
 
 }

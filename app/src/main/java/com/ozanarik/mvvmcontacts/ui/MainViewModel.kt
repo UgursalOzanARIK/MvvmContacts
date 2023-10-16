@@ -23,15 +23,10 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val firebaseStorage:FirebaseStorage, private val firestore: FirebaseFirestore,private val auth: FirebaseAuth) :ViewModel() {
+class MainViewModel @Inject constructor(private val firestore: FirebaseFirestore,private val auth: FirebaseAuth) :ViewModel() {
 
     private val _signUpResult:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val signUpResult:StateFlow<Resource<Unit>> = _signUpResult
-
-    private val _uploadPhotoState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
-    val uploadPhotoState:StateFlow<Resource<Unit>> = _uploadPhotoState
-
-
 
     private val _uploadContactToFireStoreState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val uploadContactToFireStoreState:StateFlow<Resource<Unit>> = _uploadContactToFireStoreState

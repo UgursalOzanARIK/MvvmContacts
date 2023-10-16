@@ -19,6 +19,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,6 +33,7 @@ import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.FragmentContactsBinding
 import com.ozanarik.mvvmcontacts.ui.LoginSignUpActivity
 import com.ozanarik.mvvmcontacts.ui.MainViewModel
+import com.ozanarik.mvvmcontacts.ui.RoomLocalViewModel
 import com.ozanarik.mvvmcontacts.ui.adapter.ContactsAdapter
 import com.ozanarik.mvvmcontacts.util.AdapterItemClickListener
 import com.ozanarik.mvvmcontacts.util.Resource
@@ -45,6 +47,7 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
     private lateinit var binding: FragmentContactsBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var contactsAdapter: ContactsAdapter
+    private lateinit var roomLocalViewModel: RoomLocalViewModel
 
     private val mainViewModel:MainViewModel by viewModels()
 
@@ -85,7 +88,6 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
 
     private fun signOutUser(){
 
-
         mainViewModel.signOutUser()
         viewLifecycleOwner.lifecycleScope.launch {
             mainViewModel.signOutState.collect{signOutResult->
@@ -94,6 +96,7 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
 
                     is Resource.Success->{
                         findNavController().navigate(R.id.action_action_Contacts_to_loginSignUpActivity)
+                        roomLocalViewModel.
                     }
                     is Resource.Error->{
                         Toast.makeText(requireContext(),signOutResult.message,Toast.LENGTH_LONG).show()
@@ -137,6 +140,7 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
         firestore = Firebase.firestore
         auth = Firebase.auth
         readFireStoreContacts()
+        roomLocalViewModel = ViewModelProvider(this)[RoomLocalViewModel::class.java]
 
         binding.floatingActionButton.setOnClickListener {
 
@@ -156,14 +160,13 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
                     is Resource.Success->{
                         resultData?.let { contactsAdapter.differList.submitList(it.data) }
                         contactsAdapter.notifyDataSetChanged()
-                        Log.e("asdas","got data")
+                        Log.e("Got data","got data")
                     }
                     is Resource.Loading->{
-                        Log.e("asd","loading")
+                        Log.e("isLoading","LOADING")
                     }
                     is Resource.Error->{
                         Toast.makeText(requireContext(),resultData.message, Toast.LENGTH_LONG).show()
-                        Log.e("asd","asdasd")
                     }
                 }
             }

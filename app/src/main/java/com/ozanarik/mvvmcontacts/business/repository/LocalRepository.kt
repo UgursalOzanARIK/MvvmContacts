@@ -6,28 +6,33 @@ import com.ozanarik.mvvmcontacts.util.Resource
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import java.sql.SQLException
 
 class LocalRepository @Inject constructor(private val contactsDB: ContactsDB) {
 
 
-    fun getAllContacts():Flow<Resource<List<Contacts>>> = flow{
+    fun getAllContacts():Flow<Resource<List<Contacts>>> = flow {
 
         emit(Resource.Loading())
+
         try {
 
             val contactList = contactsDB.getContactsDao().getAllContacts()
 
-            contactList.collect{allContacts->
+            contactList.collect{allContact->
 
-                emit(Resource.Success(allContacts))
+                emit(Resource.Success(allContact))
             }
+
         }catch (e:SQLException){
-            emit(Resource.Error(e.localizedMessage!!))
+            emit(Resource.Error(e.localizedMessage?:"An error occured!"))
         }catch (e:Exception){
-            emit(Resource.Error(e.localizedMessage!!))
+            emit(Resource.Error(e.localizedMessage?:"An error occured!"))
         }
+
+
     }
 
     suspend fun insertContact(contacts: Contacts) {

@@ -172,6 +172,9 @@ class ContactDetailFragment : Fragment() {
 
     private fun deleteContactFromFireStore(){
         mainViewModel.deleteFireStoreContact(contactName,contactPhoneNumber)
+        val contact = Contacts(0,contactName,contactPhoneNumber)
+        localViewModel.deleteContact(contact)
+
             viewLifecycleOwner.lifecycleScope.launch {
 
             mainViewModel.deleteFromFireStoreStateFlow.collect{hasDeleted->
@@ -193,6 +196,8 @@ class ContactDetailFragment : Fragment() {
             }
         }
     }
+
+
     private fun shareContact(){
 
         val intent = Intent(Intent.ACTION_SEND)

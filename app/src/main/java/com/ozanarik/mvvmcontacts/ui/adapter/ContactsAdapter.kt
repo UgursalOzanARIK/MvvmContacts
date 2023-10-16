@@ -42,8 +42,6 @@ class ContactsAdapter(private val clickListener: AdapterItemClickListener): Recy
     override fun onBindViewHolder(holder: ContactsHolder, position: Int) {
         val currentContact = differList.currentList[position]
 
-
-
         holder.binding.apply {
             textViewName.text = currentContact.name
         }
@@ -53,7 +51,6 @@ class ContactsAdapter(private val clickListener: AdapterItemClickListener): Recy
                 clickListener.onItemClick(position)
             }
         }
-
     }
 
     override fun getItemCount(): Int {
