@@ -75,7 +75,6 @@ class ContactDetailFragment : Fragment() {
         handleUserContactIntents()
         getIntentContactData()
         handleContactDetailImageViewButtonClicks()
-        addToFavourites()
         //FUNCTIONS***************************************************
     }
     private fun handleContactDetailImageViewButtonClicks(){
@@ -146,16 +145,7 @@ class ContactDetailFragment : Fragment() {
         }
     }
 
-    private fun addToFavourites(){
 
-        binding.imageViewFav.setOnClickListener {
-
-            val newContact = Contacts(0,contactName,contactPhoneNumber)
-
-            localViewModel.insertContact(newContact)
-            Snackbar.make(binding.imageViewFav,"$contactName added to favourites!",Snackbar.LENGTH_LONG).show()
-        }
-    }
 
     private fun updateContact(){
 
@@ -172,10 +162,8 @@ class ContactDetailFragment : Fragment() {
 
     private fun deleteContactFromFireStore(){
         mainViewModel.deleteFireStoreContact(contactName,contactPhoneNumber)
-        val contact = Contacts(0,contactName,contactPhoneNumber)
-        localViewModel.deleteContact(contact)
 
-            viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
 
             mainViewModel.deleteFromFireStoreStateFlow.collect{hasDeleted->
                 when(hasDeleted){
@@ -196,7 +184,6 @@ class ContactDetailFragment : Fragment() {
             }
         }
     }
-
 
     private fun shareContact(){
 

@@ -76,7 +76,7 @@ class AddContactDialogFragment : DialogFragment(){
         }
         else{
 
-            Snackbar.make(binding.buttonSaveContact,"Contact name and contact phone number must be filled properly",Snackbar.LENGTH_LONG).show()
+            Snackbar.make(binding.buttonSaveContact,"Contact name and/or contact phone number must be filled properly",Snackbar.LENGTH_LONG).show()
         }
 }
 

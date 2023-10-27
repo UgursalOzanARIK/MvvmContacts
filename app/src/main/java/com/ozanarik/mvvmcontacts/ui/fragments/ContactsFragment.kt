@@ -96,7 +96,6 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
 
                     is Resource.Success->{
                         findNavController().navigate(R.id.action_action_Contacts_to_loginSignUpActivity)
-                        roomLocalViewModel.
                     }
                     is Resource.Error->{
                         Toast.makeText(requireContext(),signOutResult.message,Toast.LENGTH_LONG).show()
