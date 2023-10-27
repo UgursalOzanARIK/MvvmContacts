@@ -62,9 +62,12 @@ class AddContactDialogFragment : DialogFragment(){
 
                         is Resource.Success->{
                             Snackbar.make(binding.buttonSaveContact,"$contactName saved",Snackbar.LENGTH_LONG).show()
+                            binding.savingPb.visibility = View.INVISIBLE
+
                         }
                         is Resource.Loading->{
                             Snackbar.make(binding.buttonSaveContact,"Saving Contact",Snackbar.LENGTH_LONG).show()
+                            binding.savingPb.visibility = View.VISIBLE
                         }
                         is Resource.Error->{
                             Snackbar.make(binding.buttonSaveContact,"${saveResult.message}",Snackbar.LENGTH_LONG).show()

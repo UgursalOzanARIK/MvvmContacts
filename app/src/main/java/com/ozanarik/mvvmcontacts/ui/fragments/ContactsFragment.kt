@@ -1,6 +1,5 @@
 package com.ozanarik.mvvmcontacts.ui.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,7 +9,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,12 +16,10 @@ import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -31,9 +27,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.FragmentContactsBinding
-import com.ozanarik.mvvmcontacts.ui.LoginSignUpActivity
 import com.ozanarik.mvvmcontacts.ui.MainViewModel
-import com.ozanarik.mvvmcontacts.ui.RoomLocalViewModel
 import com.ozanarik.mvvmcontacts.ui.adapter.ContactsAdapter
 import com.ozanarik.mvvmcontacts.util.AdapterItemClickListener
 import com.ozanarik.mvvmcontacts.util.Resource
@@ -47,7 +41,6 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
     private lateinit var binding: FragmentContactsBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var contactsAdapter: ContactsAdapter
-    private lateinit var roomLocalViewModel: RoomLocalViewModel
 
     private val mainViewModel:MainViewModel by viewModels()
 
@@ -106,8 +99,6 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
                 }
             }
         }
-
-
     }
 
 
@@ -139,7 +130,6 @@ class ContactsFragment : Fragment(),SearchView.OnQueryTextListener {
         firestore = Firebase.firestore
         auth = Firebase.auth
         readFireStoreContacts()
-        roomLocalViewModel = ViewModelProvider(this)[RoomLocalViewModel::class.java]
 
         binding.floatingActionButton.setOnClickListener {
 

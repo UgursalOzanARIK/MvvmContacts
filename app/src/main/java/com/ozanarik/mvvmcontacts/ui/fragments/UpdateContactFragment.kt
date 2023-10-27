@@ -80,6 +80,5 @@ class UpdateContactFragment : Fragment() {
 
         findNavController().navigate(R.id.action_updateContactFragment_to_action_Contacts)
 
-
     }
 }

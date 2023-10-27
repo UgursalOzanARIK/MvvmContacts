@@ -40,8 +40,8 @@ class MainViewModel @Inject constructor(private val firestore: FirebaseFirestore
     private val _searchState:MutableStateFlow<Resource<List<Contacts>>> = MutableStateFlow(Resource.Loading())
     val searchState:StateFlow<Resource<List<Contacts>>> = _searchState
 
-    private val _updateState:MutableStateFlow<Resource<List<Contacts>>> = MutableStateFlow(Resource.Loading())
-    val updateState:StateFlow<Resource<List<Contacts>>> = _updateState
+    private val _updateState:MutableStateFlow<Resource<Contacts>> = MutableStateFlow(Resource.Loading())
+    val updateState:StateFlow<Resource<Contacts>> = _updateState
 
     private val _signOutState:MutableStateFlow<Resource<Unit>> = MutableStateFlow(Resource.Loading())
     val signOutState:StateFlow<Resource<Unit>> = _signOutState
@@ -166,8 +166,6 @@ fun uploadContactToFireStore(contactName:String, contactPhoneNumber:String){
                                     val newContact=Contacts(0,contactName as String,contactPhoneNumber as String)
                                     newContactList.add(newContact)
                                 }
-
-
                             }
 
                             //TO ACCESS THE FIRESTORE CONTACTS DATA ONLY ONCE AT A TIME, PREVENTING DUPLICATION AND UNNECESSARY LISTING ON RECYCLERVIEW

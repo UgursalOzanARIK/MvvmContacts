@@ -45,15 +45,12 @@ class LoginSignUpActivity : AppCompatActivity() {
             signIn()
         }
 
-
         }
-
 
     private fun signIn(){
 
         val email = binding.editTextEmail.text.toString()
         val password = binding.editTextPassword.text.toString()
-
             if(email.isNotEmpty() && password.isNotEmpty()){
                 mainViewModel.signIn(email,password)
 
@@ -70,9 +67,7 @@ class LoginSignUpActivity : AppCompatActivity() {
                             is Resource.Loading->{
                                 Snackbar.make(binding.buttonSignIn,"Loading",Snackbar.LENGTH_LONG).show()
                             }
-
                         }
-
                     }
                 }
 

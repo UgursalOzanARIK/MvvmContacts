@@ -1,30 +1,19 @@
 package com.ozanarik.mvvmcontacts.ui.fragments
 
-import android.Manifest
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
@@ -32,11 +21,9 @@ import com.ozanarik.mvvmcontacts.R
 import com.ozanarik.mvvmcontacts.databinding.FragmentContactDetailBinding
 import com.ozanarik.mvvmcontacts.model.Contacts
 import com.ozanarik.mvvmcontacts.ui.MainViewModel
-import com.ozanarik.mvvmcontacts.ui.RoomLocalViewModel
 import com.ozanarik.mvvmcontacts.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -45,10 +32,7 @@ class ContactDetailFragment : Fragment() {
     private lateinit var contactName:String
     private lateinit var contactPhoneNumber:String
 
-    private lateinit var localViewModel: RoomLocalViewModel
     private lateinit var mainViewModel: MainViewModel
-
-    private lateinit var animJob: Job
 
 
     override fun onCreateView(
@@ -64,10 +48,7 @@ class ContactDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        localViewModel = ViewModelProvider(this)[RoomLocalViewModel::class.java]
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
-
-        animJob = Job()
 
         //FUNCTIONS***************************************************
         updateContact()
@@ -81,7 +62,6 @@ class ContactDetailFragment : Fragment() {
         binding.imgViewMore.setOnClickListener {
             handlePopUpMenuForDeleteShareContact()
         }
-
     }
 
     private fun getIntentContactData(){
@@ -241,6 +221,5 @@ class ContactDetailFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         binding.imageViewContactPhoto.setImageBitmap(null)
-        animJob.cancel()
     }
 }
