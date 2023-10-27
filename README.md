@@ -29,7 +29,7 @@
 
 5.XML
 
-6.Coroutines
+6.Coroutines and Flows
 
 # **Screenshots from the app**
 
