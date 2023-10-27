@@ -33,14 +33,4 @@
 
 # **Screenshots from the app**
 
-![notnullfield](https://github.com/UgursalOzanARIK/MvvmContacts/assets/31523135/45746e80-4979-4570-a5da-d903caf8b67b)
-
-![savedcontact](https://github.com/UgursalOzanARIK/MvvmContacts/assets/31523135/007c7cfe-1caf-4690-99a9-6c8186ebb7ce)
-
-![mainpage](https://github.com/UgursalOzanARIK/MvvmContacts/assets/31523135/6c39fc3e-747a-4903-8aa6-e2466d1e46e7)
-
-![contactdetail](https://github.com/UgursalOzanARIK/MvvmContacts/assets/31523135/8c62e23d-c8f1-4186-89dc-b4ec627b5aef)
-
-![updatecontactinfo](https://github.com/UgursalOzanARIK/MvvmContacts/assets/31523135/4506acf2-44e2-44f8-bc72-0a21864b13a2)
-
-![deleteshare](https://github.com/UgursalOzanARIK/MvvmContacts/assets/31523135/de25a105-e112-4428-946a-2160a1c3d567)
+![notnullfield](https://github.com/UgursalOzanARIK/MvvmContacts/assets/31523135/efe74060-5bde-4b4a-9f2e-d77bd35d0e54)
